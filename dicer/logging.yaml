@@ -1,0 +1,30 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  default:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+handlers:
+  default_info:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: default
+    filename: dicer_info.log
+    when: midnight
+    backupCount: 14
+    encoding: utf8
+  default_error:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: ERROR
+    formatter: default
+    filename: dicer_error.log
+    when: midnight
+    backupCount: 14
+    encoding: utf8
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: default
+
+root:
+    level: INFO
+    handlers: [default_info, default_error, console]
