@@ -6,7 +6,7 @@ from .keycloak_rest_client import KeycloakRestClient
 from .config import transmart_config
 
 
-class TransmartApiException(Exception):
+class TransmartException(Exception):
     pass
 
 
@@ -41,11 +41,11 @@ class TransmartRestClient(object):
         :return: json-encoded content of a response, if any
         """
         if response.status_code == 401:
-            logging.error('Export failed. Unauthorized.')
-            raise TransmartApiException()
-        if response.status_code != 200:
-            logging.error(f'Export failed. Error occurred. Response status {response.status_code}')
-            raise TransmartApiException()
+            logging.error('Request failed. Unauthorized.')
+            raise TransmartException()
+        if response.status_code not in [200, 201]:
+            logging.error(f'Request failed. Error occurred. Response status {response.status_code}')
+            raise TransmartException()
         return response.json()
 
     def get(self, path: str):
