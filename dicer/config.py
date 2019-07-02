@@ -7,7 +7,8 @@ keycloak_config = dict(
 )
 
 transmart_config = dict(
-    host=os.environ.get('TRANSMART_URL')
+    host=os.environ.get('TRANSMART_URL'),
+    verify_cert=True,
 )
 
 logging_config = dict(

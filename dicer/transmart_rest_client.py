@@ -14,6 +14,7 @@ class TransmartRestClient(object):
 
     def __init__(self):
         self.url = transmart_config.get("host")
+        self.verify = transmart_config.get("verify_cert")
         self.keycloak = KeycloakRestClient()
 
     def get_observations(self, constraint):
@@ -55,7 +56,9 @@ class TransmartRestClient(object):
         """
         url = f'{self.url}{path}'
         logging.info('Making a GET call to: %s' % url)
-        r = requests.get(url=url, headers=self.get_headers())
+        r = requests.get(url=url,
+                         headers=self.get_headers(),
+                         verify=self.verify)
         return self.get_response_json(r)
 
     def post(self, path: str, body=None):
@@ -69,5 +72,6 @@ class TransmartRestClient(object):
         logging.info('Making a POST call to: %s' % url)
         r = requests.post(url=url,
                           json=body,
-                          headers=self.get_headers())
+                          headers=self.get_headers(),
+                          verify=self.verify)
         return self.get_response_json(r)
