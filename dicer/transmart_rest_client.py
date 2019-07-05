@@ -17,7 +17,7 @@ class TransmartRestClient(object):
         self.verify = transmart_config.get("verify_cert")
         self.keycloak = KeycloakRestClient()
 
-    def get_observations(self, constraint):
+    def get_observations(self, constraint: dict):
         """
         Get observations call
         :param constraint: transmart API constraint to request
@@ -26,6 +26,16 @@ class TransmartRestClient(object):
         path = '/v2/observations'
         body = {'type': 'clinical', 'constraint': constraint}
         return self.post(path, body)
+
+    def get_tree_nodes(self, depth=0, tags=True, counts=False):
+        """
+        Get concepts call
+        :param depth: maximum tree node depth
+        :param tags: include metadata tags
+        :return: response body (json) of the concepts call of transmart API
+        """
+        path = '/v2/tree_nodes'
+        return self.get(path, depth=depth, tags=tags, counts=counts)
 
     def get_headers(self):
         token = self.keycloak.get_token()
@@ -48,7 +58,7 @@ class TransmartRestClient(object):
             raise TransmartException()
         return response.json()
 
-    def get(self, path: str):
+    def get(self, path: str, **kwargs):
         """
         GET call to the tranSMART server.
         :param path: the API path to call.
@@ -57,6 +67,7 @@ class TransmartRestClient(object):
         url = f'{self.url}{path}'
         logging.info('Making a GET call to: %s' % url)
         r = requests.get(url=url,
+                         params=kwargs,
                          headers=self.get_headers(),
                          verify=self.verify)
         return self.get_response_json(r)

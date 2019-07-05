@@ -1,11 +1,12 @@
+import logging.config
 import os
-import sys
-import yaml
+from pathlib import Path
+
 import click
-import logging
+import yaml
 
 from dicer.config import logging_config
-from .transmart_rest_client import TransmartRestClient
+from dicer.hyper_dicer import HyperDicer
 
 
 def setup_logging(default_level=logging.INFO):
@@ -22,33 +23,13 @@ def setup_logging(default_level=logging.INFO):
         logging.basicConfig(level=default_level)
 
 
-def run(input_file: str):
-    """
-    TODO Sample usage - getting observations from tranSMART and outputting the response to the console.
-    :param input_file: path to the file containing constraint in JSON format
-            to be used in tranSMART call
-    :return
-    """
-    logging.info('Starting...')
-    try:
-        contents = {}
-        with open(input_file, 'r') as f:
-            logging.info('Reading constraint from file {} ...'.format(input_file))
-            contents = f.read()
-        transmart_client = TransmartRestClient()
-        json_response = transmart_client.get_observations(contents)
-        logging.info('Received response: {}'.format(json_response))
-        logging.info('Done.')
-    except Exception as e:
-        logging.error(e)
-        sys.exit(1)
-
-
 @click.command()
-@click.argument('input_file')
-def dicer(input_file: str):
+@click.argument('input_file', type=click.Path(dir_okay=False, exists=True, readable=True))
+@click.argument('output_dir', type=click.Path(file_okay=False, writable=True))
+def dicer(input_file: Path, output_dir: Path):
     setup_logging()
-    run(input_file)
+    hyper_dicer = HyperDicer(Path(input_file), Path(output_dir))
+    hyper_dicer.run()
 
 
 def main():
