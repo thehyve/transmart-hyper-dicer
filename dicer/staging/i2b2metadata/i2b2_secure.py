@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from pandas import DataFrame
 
+from dicer.query_results import QueryResults
 from dicer.staging.tm_copy_staging_table import TmCopyStagingTable
 
 
@@ -12,7 +13,7 @@ class I2b2Secure(TmCopyStagingTable):
                        'conceptPath': 'concept_path',
                        'name': 'name_char'}
 
-    def __init__(self, query_results: dict):
+    def __init__(self, query_results: QueryResults):
         self.query_results = query_results
 
     def build_transmart_copy_df(self) -> DataFrame:
@@ -41,8 +42,7 @@ class I2b2Secure(TmCopyStagingTable):
                 parse_tree(child_node, parents, concept_codes, selected_tree_nodes)
             return selected_tree_nodes
 
-        tree_root = self.query_results['tree_nodes']['tree_nodes'][0]
-        selected_tree_nodes = dict()
+        tree_root = self.query_results.tree_nodes['tree_nodes'][0]
         selected_tree_nodes = parse_tree(node=tree_root, parents=[], concept_codes=concept_codes, selected_tree_nodes={})
         print(selected_tree_nodes)
         return selected_tree_nodes
@@ -52,5 +52,5 @@ class I2b2Secure(TmCopyStagingTable):
         Get every concept code that was returned by the observations query
         :return: concept code set
         """
-        json_observations = self.query_results['observations']
-        return {c['conceptCode'] for c in json_observations['dimensionElements']['concept']}
+        hypercube = self.query_results.observations
+        return {c['conceptCode'] for c in hypercube.dimensionElements['concept']}

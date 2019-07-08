@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 
 from dicer.helper import read_tm_query_from_file
+from dicer.query_results import QueryResults
 from dicer.staging.i2b2demodata.concept_dimension import ConceptDimension
 from dicer.staging.i2b2demodata.patient_dimension import PatientDimension
 from dicer.staging.i2b2metadata.i2b2_secure import I2b2Secure
@@ -16,11 +17,11 @@ class HyperDicer:
 
         self.create_output_dirs()
         self.transmart_client = TransmartRestClient()
-        self.query_results = {
-            'observations': self.transmart_client.get_observations(self.json_query),
-            'tree_nodes': self.transmart_client.get_tree_nodes(depth=0, tags=True),
+        self.query_results = QueryResults(
+            self.transmart_client.get_observations(self.json_query),
+            self.transmart_client.get_tree_nodes(depth=0, tags=True)
             # TODO Add other api queries that are needed
-        }
+        )
         self.output_tables = [
             PatientDimension,
             ConceptDimension,

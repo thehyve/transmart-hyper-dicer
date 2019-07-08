@@ -1,15 +1,14 @@
 POST_JSON_RESPONSES = {
-    '/auth/realms/test/protocol/openid-connect/token':  {
+    '/auth/realms/test/protocol/openid-connect/token': {
         'access_token': '54604e3b-4d6a-419d-9173-4b1af0530bfb',
         'token_type': 'bearer',
         'expires_in': 42695,
         'scope': 'read write'},
     '/v2/observations': {
-        'dimensionDeclarations': [
-        {
+        'dimensionDeclarations': [{
             'name': 'study',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'Object',
             'fields': [
                 {
@@ -17,11 +16,10 @@ POST_JSON_RESPONSES = {
                     'type': 'String'
                 }
             ]
-        },
-        {
+        }, {
             'name': 'concept',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'Object',
             'fields': [
                 {
@@ -37,8 +35,7 @@ POST_JSON_RESPONSES = {
                     'type': 'String'
                 }
             ]
-        },
-        {
+        }, {
             'name': 'patient',
             'dimensionType': 'subject',
             'sortIndex': 1,
@@ -93,11 +90,10 @@ POST_JSON_RESPONSES = {
                     'type': 'String'
                 }
             ]
-        },
-        {
+        }, {
             'name': 'visit',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'Object',
             'fields': [
                 {
@@ -129,32 +125,28 @@ POST_JSON_RESPONSES = {
                     'type': 'Object'
                 }
             ]
-        },
-        {
+        }, {
             'name': 'start time',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'Timestamp',
             'inline': 'true'
-        },
-        {
+        }, {
             'name': 'end time',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'Timestamp',
             'inline': 'true'
-        },
-        {
+        }, {
             'name': 'location',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'String',
             'inline': 'true'
-        },
-        {
+        }, {
             'name': 'trial visit',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'Object',
             'fields': [
                 {
@@ -174,113 +166,102 @@ POST_JSON_RESPONSES = {
                     'type': 'Int'
                 }
             ]
-        },
-        {
+        }, {
             'name': 'provider',
             'dimensionType': 'attribute',
-            'sortIndex': 'null',
+            'sortIndex': None,
             'valueType': 'String'
-        },
-        {
+        }, {
             'name': 'sample_type',
-            'dimensionType': 'null',
-            'sortIndex': 'null',
+            'dimensionType': None,
+            'sortIndex': None,
             'valueType': 'String'
-        },
-        {
+        }, {
             'name': 'missing_value',
-            'dimensionType': 'null',
-            'sortIndex': 'null',
+            'dimensionType': None,
+            'sortIndex': None,
             'valueType': 'String'
-        }
-    ],
-         'sort': [
-        {
+        }],
+        'sort': [{
             'dimension': 'concept',
             'sortOrder': 'asc'
-        },
-        {
+        }, {
             'dimension': 'provider',
             'sortOrder': 'asc'
-        },
-        {
+        }, {
             'dimension': 'patient',
             'sortOrder': 'asc'
-        },
-        {
+        }, {
             'dimension': 'visit',
             'sortOrder': 'asc'
-        },
-        {
+        }, {
             'dimension': 'start time',
             'sortOrder': 'asc'
-        }
-    ],
-         'cells': [
-                {
+        }],
+        'cells': [{
                     'inlineDimensions': [
-                        'null',
-                        'null',
+                        None,
+                        None,
                         '@'
                     ],
                     'dimensionIndexes': [
                         0,
                         0,
                         0,
-                        'null',
+                        None,
                         0,
-                        'null',
-                        'null',
-                        'null',
-                        'null',
-                        'null',
-                        'null',
-                        'null'
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None
                     ],
                     'numericValue': 20
                 },
                 {
                     'inlineDimensions': [
-                        'null',
-                        'null',
+                        None,
+                        None,
                         '@'
                     ],
                     'dimensionIndexes': [
                         0,
                         1,
                         0,
-                        'null',
+                        None,
                         0,
-                        'null',
-                        'null',
-                        'null',
-                        'null',
-                        'null',
-                        'null',
-                        'null'
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None,
+                        None
                     ],
                     'stringValue': 'Caucasian'
                 },
                 {
                     'inlineDimensions': [
-                        'null',
-                        'null',
+                        None,
+                        None,
                         '@'
                     ],
                     'dimensionIndexes': [
                         0,
                         2,
                         0,
-                        'null',
+                        None,
                         0,
-                        'null',
-                        'null',
-                        'null'
+                        None,
+                        None,
+                        None
                     ],
                     'stringValue': 'Female'
                 }
             ],
-         'dimensionElements': {
+        'dimensionElements': {
             'study': [
                 {
                     'name': 'CATEGORICAL_VALUES'
@@ -311,12 +292,12 @@ POST_JSON_RESPONSES = {
                     'subjectIds': {
                         'SUBJ_ID': 'CV:40'
                     },
-                    'birthDate': 'null',
-                    'deathDate': 'null',
+                    'birthDate': None,
+                    'deathDate': None,
                     'age': 20,
                     'race': 'Caucasian',
-                    'maritalStatus': 'null',
-                    'religion': 'null',
+                    'maritalStatus': None,
+                    'religion': None,
                     'sexCd': 'Female',
                     'sex': 'female'
                 }
@@ -326,8 +307,8 @@ POST_JSON_RESPONSES = {
                 {
                     'id': -30,
                     'relTimeLabel': '1',
-                    'relTimeUnit': 'null',
-                    'relTime': 'null',
+                    'relTimeUnit': None,
+                    'relTime': None,
                 }
             ],
             'provider': [],
@@ -338,7 +319,12 @@ POST_JSON_RESPONSES = {
 }
 
 GET_JSON_RESPONSES = {
-    'v2/...': {
+    '/v2/tree_nodes?depth=0&tags=True&counts=False': {
+        'tree_nodes': [
+            {
+                'fullName': '\\Dummy'
+            }
+        ]
     }
 
 }
