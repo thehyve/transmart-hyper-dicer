@@ -1,11 +1,14 @@
-import logging
+import sys
 from pathlib import Path
 
+from transmart_loader.console import Console
+from transmart_loader.copy_writer import TransmartCopyWriter
+from transmart_loader.loader_exception import LoaderException
+from transmart_loader.transmart import DataCollection
+
 from dicer.helper import read_tm_query_from_file
+from dicer.mapper import map_query_results
 from dicer.query_results import QueryResults
-from dicer.staging.i2b2demodata.concept_dimension import ConceptDimension
-from dicer.staging.i2b2demodata.patient_dimension import PatientDimension
-from dicer.staging.i2b2metadata.i2b2_secure import I2b2Secure
 from dicer.transmart_rest_client import TransmartRestClient
 
 
@@ -15,33 +18,30 @@ class HyperDicer:
         self.json_query = read_tm_query_from_file(input_file)
         self.output_root_dir = output_dir
 
-        self.create_output_dirs()
-        self.transmart_client = TransmartRestClient()
-        self.query_results = QueryResults(
-            self.transmart_client.get_observations(self.json_query),
-            self.transmart_client.get_tree_nodes(depth=0, tags=True)
-            # TODO Add other api queries that are needed
-        )
-        self.output_tables = [
-            PatientDimension,
-            ConceptDimension,
-            I2b2Secure,
-            # TODO add remaining tm_copy staging files
-        ]
-
     def run(self) -> None:
         """
         Construct and write all transmart-copy staging files based on the input query
         :return: None
         """
-        for tm_copy_table in self.output_tables:
-            table = tm_copy_table(self.query_results)
-            df = table.build_transmart_copy_df()
-            table.write_to_file(df, self.output_root_dir)
-        logging.info('Done.')
+        Console.title('TranSMART Hyper Dicer')
+        try:
+            Console.info('Reading data from tranSMART...')
+            transmart_client = TransmartRestClient()
+            query_results = QueryResults(
+                transmart_client.get_observations(self.json_query),
+                transmart_client.get_tree_nodes(depth=0, tags=True),
+                transmart_client.get_dimensions(),
+                transmart_client.get_studies(),
+                transmart_client.get_relation_types(),
+                transmart_client.get_relations()
+            )
 
-    def create_output_dirs(self) -> None:
-        i2b2demodata_dir = self.output_root_dir / 'i2b2demodata'
-        i2b2metadata_dir = self.output_root_dir / 'i2b2metadata'
-        i2b2demodata_dir.mkdir(parents=True, exist_ok=True)
-        i2b2metadata_dir.mkdir(parents=True, exist_ok=True)
+            collection: DataCollection = map_query_results(query_results)
+
+            Console.info('Writing files to {}'.format(self.output_root_dir))
+            copy_writer = TransmartCopyWriter(str(self.output_root_dir))
+            copy_writer.write_collection(collection)
+            Console.info('Done.')
+        except LoaderException as e:
+            Console.error(e)
+            sys.exit(1)

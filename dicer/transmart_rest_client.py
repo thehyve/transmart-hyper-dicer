@@ -1,10 +1,10 @@
-import requests
 import logging
 
-from dicer.transmart import Hypercube
-from .keycloak_rest_client import KeycloakRestClient
+import requests
 
+from dicer.transmart import Hypercube, Dimensions, TreeNodes, Studies, RelationTypes, Relations
 from .config import transmart_config
+from .keycloak_rest_client import KeycloakRestClient
 
 
 class TransmartException(Exception):
@@ -35,10 +35,47 @@ class TransmartRestClient(object):
         :param depth: maximum tree node depth
         :param tags: include metadata tags
         :param counts: include counts
-        :return: response body (json) of the tree nodes call of the transmart API
+        :return: The response of the tree nodes call of the transmart API
         """
         path = '/v2/tree_nodes'
-        return self.get(path, depth=depth, tags=tags, counts=counts)
+        response: dict = self.get(path, depth=depth, tags=tags, counts=counts)
+        return TreeNodes(**response)
+
+    def get_dimensions(self):
+        """
+        Get all dimensions metadata
+        :return: All dimensions
+        """
+        path = '/v2/dimensions'
+        response: dict = self.get(path)
+        return Dimensions(**response)
+
+    def get_studies(self):
+        """
+        Get all studies call
+        :return: All studies
+        """
+        path = '/v2/studies'
+        response: dict = self.get(path)
+        return Studies(**response)
+
+    def get_relation_types(self):
+        """
+        Get all relation types call
+        :return: All relation types
+        """
+        path = '/v2/pedigree/relation_types'
+        response: dict = self.get(path)
+        return RelationTypes(**response)
+
+    def get_relations(self):
+        """
+        Get relations between patients call
+        :return: Binary relation between patients
+        """
+        path = '/v2/pedigree/relations'
+        response: dict = self.get(path)
+        return Relations(**response)
 
     def get_headers(self):
         token = self.keycloak.get_token()

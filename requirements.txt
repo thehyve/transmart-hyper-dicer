@@ -1,5 +1,6 @@
 click == 7.0
 pandas == 0.24.2
-pydantic == 0.29
+pydantic == 0.30
 PyYAML == 5.1
 requests == 2.22.0
+transmart-loader == 1.1.0
