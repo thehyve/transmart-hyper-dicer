@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+from dicer.transmart import Hypercube
 from dicer.transmart_rest_client import TransmartRestClient
 from tests.mock_server import retry, TestMockServer
 
@@ -17,10 +18,10 @@ class TransmartRestClientTestCase(TestMockServer):
     @retry
     def test_get_observations(self):
         constraint = {'type': 'true'}
-        response = self.api.get_observations(constraint)
-        dimension_declaration = response.get('dimensionDeclarations')
-        cells = response.get('cells')
-        dimension_elements = response.get('dimensionElements')
+        response: Hypercube = self.api.get_observations(constraint)
+        dimension_declaration = response.dimensionDeclarations
+        cells = response.cells
+        dimension_elements = response.dimensionElements
         self.assertEqual(11, len(dimension_declaration))
         self.assertEqual(3, len(cells))
         self.assertEqual(8, len(dimension_elements))

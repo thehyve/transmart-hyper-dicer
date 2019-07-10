@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 from pandas import DataFrame
 
+from dicer.query_results import QueryResults
 from dicer.staging.tm_copy_staging_table import TmCopyStagingTable
 
 
@@ -21,13 +22,13 @@ class PatientDimension(TmCopyStagingTable):
 
     cols_to_drop = {'inTrialId', 'subjectIds', 'sex'}
 
-    def __init__(self, query_results: dict):
+    def __init__(self, query_results: QueryResults):
         self.query_results = query_results
 
     def build_transmart_copy_df(self) -> DataFrame:
         logging.info('Creating patient dimension df')
-        json_observations = self.query_results['observations']
-        patients_df = pd.DataFrame(json_observations['dimensionElements']['patient'])
+        hypercube = self.query_results.observations
+        patients_df = pd.DataFrame(hypercube.dimensionElements['patient'])
         patients_df.drop(labels=self.cols_to_drop, axis=1, inplace=True)
         patients_df.rename(columns=self.col_rename_dict, inplace=True)
         return patients_df

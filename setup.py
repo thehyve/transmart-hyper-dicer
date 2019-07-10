@@ -26,9 +26,9 @@ with open('requirements.txt', 'r') as f:
 setup(
     name='transmart-hyper-dicer',
     version=version['__version__'],
-    description="Data slicing tool for reading data from one tranSMART and uploading it to another",
+    description='Data slicing tool for reading data from one tranSMART and uploading it to another',
     long_description=readme + '\n\n',
-    author="Ewelina Grudzien",
+    author='Ewelina Grudzien',
     author_email='ewelina@thehyve.nl',
     url='https://github.com/thehyve/transmart-hyper-dicer',
     packages=[
@@ -71,6 +71,7 @@ setup(
         'pytest',
         'pytest-cov',
         'pycodestyle',
+        'responses'
     ],
     extras_require={
         'dev':  ['prospector[with_pyroma]', 'pygments', 'yapf', 'isort'],

@@ -1,6 +1,7 @@
 import requests
 import logging
 
+from dicer.transmart import Hypercube
 from .keycloak_rest_client import KeycloakRestClient
 
 from .config import transmart_config
@@ -17,22 +18,24 @@ class TransmartRestClient(object):
         self.verify = transmart_config.get("verify_cert")
         self.keycloak = KeycloakRestClient()
 
-    def get_observations(self, constraint: dict):
+    def get_observations(self, constraint: dict) -> Hypercube:
         """
         Get observations call
         :param constraint: transmart API constraint to request
-        :return: response body (json) of the observation call of transmart API
+        :return: The Hypercube response of the observations call of the transmart API
         """
         path = '/v2/observations'
         body = {'type': 'clinical', 'constraint': constraint}
-        return self.post(path, body)
+        response: dict = self.post(path, body)
+        return Hypercube(**response)
 
     def get_tree_nodes(self, depth=0, tags=True, counts=False):
         """
-        Get concepts call
+        Get tree nodes call
         :param depth: maximum tree node depth
         :param tags: include metadata tags
-        :return: response body (json) of the concepts call of transmart API
+        :param counts: include counts
+        :return: response body (json) of the tree nodes call of the transmart API
         """
         path = '/v2/tree_nodes'
         return self.get(path, depth=depth, tags=tags, counts=counts)
