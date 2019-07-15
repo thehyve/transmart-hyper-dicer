@@ -1,4 +1,3 @@
-from collections import Sequence
 from typing import List
 
 from dicer.query_results import QueryResults
@@ -6,7 +5,7 @@ from dicer.transmart \
     import ConceptDimensionElement, PatientDimensionElement, RelationType as RelationTypeObject, \
     Dimension as DimensionObject, TreeNode as TreeNodeObject, Study as StudyObject
 from transmart_loader.transmart import Concept, ValueType, Patient, RelationType, IdentifierMapping, DataCollection, \
-    Dimension, Modifier, TreeNode, Study, TrialVisit
+    Dimension, Modifier, TreeNode, Study
 
 
 class DataInconsistencyException(Exception):

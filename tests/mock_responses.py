@@ -286,7 +286,7 @@ POST_JSON_RESPONSES = {
             ],
             'patient': [
                 {
-                    'id': -40,
+                    'id': 1,
                     'trial': 'CATEGORICAL_VALUES',
                     'inTrialId': '3',
                     'subjectIds': {
@@ -305,7 +305,7 @@ POST_JSON_RESPONSES = {
             'visit': [],
             'trial visit': [
                 {
-                    'id': -30,
+                    'id': 1,
                     'relTimeLabel': '1',
                     'relTimeUnit': None,
                     'relTime': None,
@@ -322,9 +322,164 @@ GET_JSON_RESPONSES = {
     '/v2/tree_nodes?depth=0&tags=True&counts=False': {
         'tree_nodes': [
             {
-                'fullName': '\\Dummy'
+                'fullName': '\\Dummy',
+                'name': 'Dummy'
+            }
+        ]
+    },
+    '/v2/dimensions': {
+        'dimensions': [
+            {
+                'name': 'study',
+                'dimensionType': 'attribute',
+                'sortIndex': None,
+                'valueType': 'Object',
+                'fields': [{'name': 'name', 'type': 'String'}],
+                'inline': False
+            },
+            {
+                'name': 'patient',
+                'dimensionType': 'subject',
+                'sortIndex': 1,
+                'valueType': 'Object',
+                'fields': [
+                    {'name': 'id', 'type': 'Int'},
+                    {'name': 'subjectIds', 'type': 'Object'},
+                    {'name': 'age', 'type': 'Int'},
+                    {'name': 'sex', 'type': 'String'}
+                ],
+                'inline': False
+            },
+            {
+                'name': 'concept',
+                'dimensionType': 'attribute',
+                'sortIndex': None,
+                'valueType': 'Object',
+                'fields': [
+                    {'name': 'conceptPath', 'type': 'String'},
+                    {'name': 'conceptCode', 'type': 'String'},
+                    {'name': 'name', 'type': 'String'}
+                ],
+                'inline': False
+            },
+            {
+                'name': 'trial visit',
+                'dimensionType': 'attribute',
+                'sortIndex': None,
+                'valueType': 'Object',
+                'fields': [
+                    {'name': 'id', 'type': 'Int'},
+                    {'name': 'relTimeLabel', 'type': 'String'},
+                    {'name': 'relTimeUnit', 'type': 'String'},
+                    {'name': 'relTime', 'type': 'Int'}
+                ],
+                'inline': False
+            },
+            {
+                'name': 'start time',
+                'dimensionType': 'attribute',
+                'sortIndex': None,
+                'valueType': 'Timestamp',
+                'inline': True
+            },
+            {
+                'name': 'visit',
+                'dimensionType': 'attribute',
+                'sortIndex': None,
+                'valueType': 'Object',
+                'fields': [
+                    {'name': 'id', 'type': 'Int'},
+                    {'name': 'activeStatusCd', 'type': 'String'},
+                    {'name': 'startDate', 'type': 'Timestamp'},
+                    {'name': 'endDate', 'type': 'Timestamp'},
+                    {'name': 'inoutCd', 'type': 'String'},
+                    {'name': 'locationCd', 'type': 'String'},
+                    {'name': 'encounterIds', 'type': 'Object'}
+                ],
+                'inline': False
+            },
+            {
+                'name': 'end time',
+                'dimensionType': 'attribute',
+                'sortIndex': None,
+                'valueType': 'Timestamp',
+                'inline': True
+            },
+            {
+                'name': 'Diagnosis ID',
+                'modifierCode': 'CSR_DIAGNOSIS_MOD',
+                'dimensionType': 'subject',
+                'sortIndex': 2,
+                'valueType': 'String',
+                'inline': False
+            },
+            {
+                'name': 'Biomaterial ID',
+                'modifierCode': 'CSR_BIOMATERIAL_MOD',
+                'dimensionType': 'subject',
+                'sortIndex': 4,
+                'valueType': 'String',
+                'inline': False
+            },
+            {
+                'name': 'Biosource ID',
+                'modifierCode': 'CSR_BIOSOURCE_MOD',
+                'dimensionType': 'subject',
+                'sortIndex': 3,
+                'valueType': 'String',
+                'inline': False
+            }
+        ]
+    },
+    '/v2/studies': {
+        'studies': [
+            {
+                'id': 1,
+                'studyId': 'CATEGORICAL_VALUES',
+                'bioExperimentId': None,
+                'secureObjectToken': 'PUBLIC',
+                'dimensions': [
+                    'study',
+                    'concept',
+                    'patient'
+                ]
+            }
+        ]
+    },
+    '/v2/pedigree/relation_types': {
+        'relationTypes': [
+            {
+                'id': 1, 'biological': False, 'description': 'Parent', 'label': 'PAR', 'symmetrical': False
+            },
+            {
+                'id': 2, 'biological': False, 'description': 'Spouse', 'label': 'SPO', 'symmetrical': True
+            },
+            {
+                'id': 3, 'biological': False, 'description': 'Sibling', 'label': 'SIB', 'symmetrical': True
+            },
+            {
+                'id': 4, 'biological': True, 'description': 'Monozygotic twin', 'label': 'MZ', 'symmetrical': True
+            },
+            {
+                'id': 5, 'biological': True, 'description': 'Dizygotic twin', 'label': 'DZ', 'symmetrical': True
+            },
+            {
+                'id': 6, 'biological': True, 'description': 'Twin with unknown zygosity', 'label': 'COT', 'symmetrical': True
+            },
+            {
+                'id': 7, 'biological': False, 'description': 'Child', 'label': 'CHI', 'symmetrical': False
+            }
+        ]
+    },
+    '/v2/pedigree/relations': {
+        'relations': [
+            {
+                'leftSubjectId': 1,
+                'relationTypeLabel': 'SPO',
+                'rightSubjectId': 2,
+                'biological': False,
+                'shareHousehold': False
             }
         ]
     }
-
 }

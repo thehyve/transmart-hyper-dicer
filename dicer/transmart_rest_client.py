@@ -1,22 +1,27 @@
 import logging
 
 import requests
+from pydantic import BaseModel
 
 from dicer.transmart import Hypercube, Dimensions, TreeNodes, Studies, RelationTypes, Relations
-from .config import transmart_config
-from .keycloak_rest_client import KeycloakRestClient
+from .keycloak_rest_client import KeycloakRestClient, KeycloakConfiguration
 
 
 class TransmartException(Exception):
     pass
 
 
+class TransmartConfiguration(BaseModel):
+    url: str
+    verify: bool = True
+    keycloak_config: KeycloakConfiguration
+
+
 class TransmartRestClient(object):
 
-    def __init__(self):
-        self.url = transmart_config.get("host")
-        self.verify = transmart_config.get("verify_cert")
-        self.keycloak = KeycloakRestClient()
+    def __init__(self, config: TransmartConfiguration):
+        self.config = config
+        self.keycloak = KeycloakRestClient(config.keycloak_config)
 
     def get_observations(self, constraint: dict) -> Hypercube:
         """
@@ -104,12 +109,12 @@ class TransmartRestClient(object):
         :param path: the API path to call.
         :return: the response.
         """
-        url = f'{self.url}{path}'
+        url = f'{self.config.url}{path}'
         logging.info('Making a GET call to: %s' % url)
         r = requests.get(url=url,
                          params=kwargs,
                          headers=self.get_headers(),
-                         verify=self.verify)
+                         verify=self.config.verify)
         return self.get_response_json(r)
 
     def post(self, path: str, body=None):
@@ -119,10 +124,10 @@ class TransmartRestClient(object):
         :param path: the API path to call
         :return: the response.
         """
-        url = f'{self.url}{path}'
+        url = f'{self.config.url}{path}'
         logging.info('Making a POST call to: %s' % url)
         r = requests.post(url=url,
                           json=body,
                           headers=self.get_headers(),
-                          verify=self.verify)
+                          verify=self.config.verify)
         return self.get_response_json(r)

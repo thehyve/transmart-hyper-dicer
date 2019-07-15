@@ -1,19 +1,22 @@
 import requests
-
-from .config import keycloak_config
+from pydantic import BaseModel
 
 
 class KeycloakException(Exception):
     pass
 
 
+class KeycloakConfiguration(BaseModel):
+    url: str
+    client_id: str
+    offline_token: str
+
+
 class KeycloakRestClient(object):
 
-    def __init__(self):
+    def __init__(self, config: KeycloakConfiguration):
         self.token = None
-        self.url = keycloak_config.get("oidc_server_url")
-        self.client_id = keycloak_config.get("client_id")
-        self.offline_token = keycloak_config.get("offline_token")
+        self.config = config
 
     def get_token(self):
         """
@@ -33,12 +36,12 @@ class KeycloakRestClient(object):
         headers = {'Accept': 'application/json',
                    'Contect-Type': 'application/x-www-form-urlencoded'
                    }
-        url = self.url + '/protocol/openid-connect/token'
+        url = self.config.url + '/protocol/openid-connect/token'
         params = {
             'grant_type': 'refresh_token',
             'scope': 'offline_access',
-            'client_id': self.client_id,
-            'refresh_token': self.offline_token
+            'client_id': self.config.client_id,
+            'refresh_token': self.config.offline_token
         }
         try:
             response = requests.post(url, params, headers=headers)
