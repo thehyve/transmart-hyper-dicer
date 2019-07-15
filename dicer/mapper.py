@@ -4,9 +4,9 @@ from typing import List
 from dicer.query_results import QueryResults
 from dicer.transmart \
     import ConceptDimensionElement, PatientDimensionElement, RelationType as RelationTypeObject, \
-    Dimension as DimensionObject
+    Dimension as DimensionObject, TreeNode as TreeNodeObject, Study as StudyObject
 from transmart_loader.transmart import Concept, ValueType, Patient, RelationType, IdentifierMapping, DataCollection, \
-    Dimension, Modifier
+    Dimension, Modifier, TreeNode, Study, TrialVisit
 
 
 class DataInconsistencyException(Exception):
@@ -19,7 +19,7 @@ def map_concept(concept_dimension_element: ConceptDimensionElement) -> Concept:
         concept_dimension_element.name,
         concept_dimension_element.conceptPath,
         ValueType.Categorical
-    )
+    ) # TODO
 
 
 def map_patient(patient_dimension_element: PatientDimensionElement) -> Patient:
@@ -41,6 +41,15 @@ def map_relation_type(relation_type: RelationTypeObject) -> RelationType:
     )
 
 
+def map_modifiers(modifier_dimension: DimensionObject) -> Modifier:
+    return Modifier(
+        modifier_dimension.modifierCode,
+        modifier_dimension.name,
+        modifier_dimension.modifierCode,
+        modifier_dimension.valueType
+    )
+
+
 def map_dimension(dimension: DimensionObject, modifiers: List[Modifier]) -> Dimension:
     modifier = next(filter(lambda x: x.modifier_code == dimension.name,  modifiers))
     return Dimension(
@@ -51,20 +60,40 @@ def map_dimension(dimension: DimensionObject, modifiers: List[Modifier]) -> Dime
     )
 
 
+def map_tree_node(tree_node: TreeNodeObject) -> TreeNode:
+    node = TreeNode(
+        tree_node.name
+    )
+    # TODO recursive mapping
+    return node
+
+
+def map_study(study: StudyObject) -> Study:
+    return Study(
+        study.studyId,
+        study.s
+    )
+
+
 def map_query_results(query_results: QueryResults) -> DataCollection:
     patient_dim_elements = query_results.observations.dimensionElements['patient']
     patients = list(map(lambda x: map_patient(PatientDimensionElement(**x)), patient_dim_elements))
 
-    modifiers: List[Modifier] = []
+    dimension_objects = query_results.dimensions.dimensions
+    modifier_objects =  list(filter(lambda x: x.modifierCode, dimension_objects))
+    modifiers = list(map(lambda x: map_modifiers(x), modifier_objects))
+    dimensions = list(map(lambda x: map_dimension(x, modifiers), dimension_objects))
 
-    dimension_elements = query_results.dimensions.dimensions
-    dimensions = list(map(lambda x: map_dimension(x, modifiers), dimension_elements))
+    study_objects = query_results.observations.dimensionElements['study']
+    all_studies = query_results.studies.studies
+    studies = [] # TODO combine
 
+    tree_node_objects = query_results.tree_nodes.tree_nodes
+    ontology = list(map(lambda x: map_tree_node(x), tree_node_objects))
     concepts = []
-    studies = []
+
     trial_visits = []
     visits = []
-    ontology = []
     observations = []
 
     relation_type_elements = query_results.relation_types.relationTypes
@@ -83,4 +112,3 @@ def map_query_results(query_results: QueryResults) -> DataCollection:
                           observations,
                           relation_types,
                           relations)
-
