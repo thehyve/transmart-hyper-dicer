@@ -110,7 +110,7 @@ class TransmartRestClient(object):
         :return: the response.
         """
         url = f'{self.config.url}{path}'
-        logging.info('Making a GET call to: %s' % url)
+        logging.debug('Making a GET call to: %s' % url)
         r = requests.get(url=url,
                          params=kwargs,
                          headers=self.get_headers(),
@@ -125,7 +125,7 @@ class TransmartRestClient(object):
         :return: the response.
         """
         url = f'{self.config.url}{path}'
-        logging.info('Making a POST call to: %s' % url)
+        logging.debug('Making a POST call to: %s' % url)
         r = requests.post(url=url,
                           json=body,
                           headers=self.get_headers(),
