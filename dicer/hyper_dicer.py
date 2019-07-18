@@ -7,7 +7,7 @@ from transmart_loader.console import Console
 from transmart_loader.copy_writer import TransmartCopyWriter
 from transmart_loader.transmart import DataCollection
 
-from dicer.mapper import map_query_results
+from dicer.loader_mapper import TransmartLoaderMapper
 from dicer.query_results import QueryResults
 from dicer.transmart_rest_client import TransmartRestClient, TransmartConfiguration
 
@@ -38,7 +38,8 @@ class HyperDicer:
             transmart_client.get_relations()
         )
 
-        collection: DataCollection = map_query_results(query_results)
+        mapper = TransmartLoaderMapper()
+        collection: DataCollection = mapper.map_query_results(query_results)
 
         Console.info('Writing files to {}'.format(output_dir))
         copy_writer = TransmartCopyWriter(str(output_dir))
