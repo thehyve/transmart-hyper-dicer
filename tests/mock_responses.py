@@ -5,7 +5,8 @@ POST_JSON_RESPONSES = {
         'expires_in': 42695,
         'scope': 'read write'},
     '/v2/observations': {
-        'dimensionDeclarations': [{
+        'dimensionDeclarations': [
+        {
             'name': 'study',
             'dimensionType': 'attribute',
             'sortIndex': None,
@@ -185,6 +186,13 @@ POST_JSON_RESPONSES = {
             'dimensionType': None,
             'sortIndex': None,
             'valueType': 'String'
+        },
+        {
+            'name': 'Diagnosis ID',
+            'dimensionType': 'subject',
+            'sortIndex': 2,
+            'valueType': 'String',
+            'modifierCode': 'CSR_DIAGNOSIS_MOD'
         }],
         'sort': [{
             'dimension': 'concept',
@@ -204,29 +212,26 @@ POST_JSON_RESPONSES = {
         }],
         'cells': [{
                     'inlineDimensions': [
-                        None,
-                        None,
+                        '2019-05-05 11:11:11',
+                        '2019-07-05 11:11:11',
                         '@'
                     ],
                     'dimensionIndexes': [
                         0,
                         0,
+                        1,
+                        0,
                         0,
                         None,
-                        0,
                         None,
                         None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        None
+                        0
                     ],
                     'numericValue': 20
                 },
                 {
                     'inlineDimensions': [
-                        None,
+                        '2019-07-22 12:00:00',
                         None,
                         '@'
                     ],
@@ -236,9 +241,6 @@ POST_JSON_RESPONSES = {
                         0,
                         None,
                         0,
-                        None,
-                        None,
-                        None,
                         None,
                         None,
                         None,
@@ -258,6 +260,7 @@ POST_JSON_RESPONSES = {
                         0,
                         None,
                         0,
+                        None,
                         None,
                         None,
                         None
@@ -304,9 +307,39 @@ POST_JSON_RESPONSES = {
                     'religion': None,
                     'sexCd': 'Female',
                     'sex': 'female'
+                },
+                {
+                    'id': 2,
+                    'trial': 'CATEGORICAL_VALUES',
+                    'inTrialId': '3',
+                    'subjectIds': {
+                        'SUBJ_ID': 'CV:12'
+                    },
+                    'birthDate': None,
+                    'deathDate': None,
+                    'age': 28,
+                    'race': 'Caucasian',
+                    'maritalStatus': None,
+                    'religion': None,
+                    'sexCd': 'Female',
+                    'sex': 'male'
                 }
             ],
-            'visit': [],
+            'visit': [
+                {
+                    'id': 1,
+                    'patientId': 1,
+                    'activeStatusCd': None,
+                    'startDate': '2016-03-29T09:00:00Z',
+                    'endDate': '2016-03-29T11:00:00Z',
+                    'inoutCd': None,
+                    'locationCd': None,
+                    'lengthOfStay': None,
+                    'encounterIds': {
+                        'VISIT_ID': 'EHR:62:1'
+                    }
+                }
+            ],
             'trial visit': [
                 {
                     'id': 1,
@@ -319,6 +352,9 @@ POST_JSON_RESPONSES = {
             'provider': [],
             'sample_type': [],
             'missing_value': [],
+            'Diagnosis ID': [
+                'D1'
+            ]
         }
     }
 }
@@ -327,115 +363,115 @@ GET_JSON_RESPONSES = {
     '/v2/tree_nodes?depth=0&tags=True&counts=False': {
         'tree_nodes': [
             {
-                "name": "CATEGORICAL_VALUES",
-                "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\",
-                "studyId": "CATEGORICAL_VALUES",
-                "type": "STUDY",
-                "visualAttributes": [
-                    "FOLDER",
-                    "ACTIVE",
-                    "STUDY"
+                'name': 'CATEGORICAL_VALUES',
+                'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\',
+                'studyId': 'CATEGORICAL_VALUES',
+                'type': 'STUDY',
+                'visualAttributes': [
+                    'FOLDER',
+                    'ACTIVE',
+                    'STUDY'
                 ],
-                "constraint": {
-                    "type": "study_name",
-                    "studyId": "CATEGORICAL_VALUES"
+                'constraint': {
+                    'type': 'study_name',
+                    'studyId': 'CATEGORICAL_VALUES'
                 },
-                "children": [
+                'children': [
                     {
-                        "name": "Demography",
-                        "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\",
-                        "studyId": "CATEGORICAL_VALUES",
-                        "type": "UNKNOWN",
-                        "visualAttributes": [
-                            "FOLDER",
-                            "ACTIVE"
+                        'name': 'Demography',
+                        'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\',
+                        'studyId': 'CATEGORICAL_VALUES',
+                        'type': 'UNKNOWN',
+                        'visualAttributes': [
+                            'FOLDER',
+                            'ACTIVE'
                         ],
-                        "children": [
+                        'children': [
                             {
-                                "name": "Age",
-                                "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Age\\",
-                                "studyId": "CATEGORICAL_VALUES",
-                                "conceptCode": "CV:DEM:AGE",
-                                "conceptPath": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Age\\",
-                                "type": "NUMERIC",
-                                "visualAttributes": [
-                                    "LEAF",
-                                    "ACTIVE",
-                                    "NUMERICAL"
+                                'name': 'Age',
+                                'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Age\\',
+                                'studyId': 'CATEGORICAL_VALUES',
+                                'conceptCode': 'CV:DEM:AGE',
+                                'conceptPath': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Age\\',
+                                'type': 'NUMERIC',
+                                'visualAttributes': [
+                                    'LEAF',
+                                    'ACTIVE',
+                                    'NUMERICAL'
                                 ],
-                                "constraint": {
-                                    "type": "and",
-                                    "args": [
+                                'constraint': {
+                                    'type': 'and',
+                                    'args': [
                                         {
-                                            "type": "concept",
-                                            "conceptCode": "CV:DEM:AGE"
+                                            'type': 'concept',
+                                            'conceptCode': 'CV:DEM:AGE'
                                         },
                                         {
-                                            "type": "study_name",
-                                            "studyId": "CATEGORICAL_VALUES"
+                                            'type': 'study_name',
+                                            'studyId': 'CATEGORICAL_VALUES'
                                         }
                                     ]
                                 }
                             },
                             {
-                                "name": "Gender",
-                                "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\",
-                                "studyId": "CATEGORICAL_VALUES",
-                                "type": "CATEGORICAL",
-                                "visualAttributes": [
-                                    "FOLDER",
-                                    "ACTIVE",
-                                    "CATEGORICAL"
+                                'name': 'Gender',
+                                'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\',
+                                'studyId': 'CATEGORICAL_VALUES',
+                                'type': 'CATEGORICAL',
+                                'visualAttributes': [
+                                    'FOLDER',
+                                    'ACTIVE',
+                                    'CATEGORICAL'
                                 ],
-                                "children": [
+                                'children': [
                                     {
-                                        "name": "Female",
-                                        "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Female\\",
-                                        "studyId": "CATEGORICAL_VALUES",
-                                        "conceptCode": "CV:DEM:SEX:F",
-                                        "conceptPath": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Female\\",
-                                        "type": "CATEGORICAL_OPTION",
-                                        "visualAttributes": [
-                                            "LEAF",
-                                            "ACTIVE",
-                                            "CATEGORICAL_OPTION"
+                                        'name': 'Female',
+                                        'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Female\\',
+                                        'studyId': 'CATEGORICAL_VALUES',
+                                        'conceptCode': 'CV:DEM:SEX:F',
+                                        'conceptPath': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Female\\',
+                                        'type': 'CATEGORICAL_OPTION',
+                                        'visualAttributes': [
+                                            'LEAF',
+                                            'ACTIVE',
+                                            'CATEGORICAL_OPTION'
                                         ],
-                                        "constraint": {
-                                            "type": "and",
-                                            "args": [
+                                        'constraint': {
+                                            'type': 'and',
+                                            'args': [
                                                 {
-                                                    "type": "concept",
-                                                    "conceptCode": "CV:DEM:SEX:F"
+                                                    'type': 'concept',
+                                                    'conceptCode': 'CV:DEM:SEX:F'
                                                 },
                                                 {
-                                                    "type": "study_name",
-                                                    "studyId": "CATEGORICAL_VALUES"
+                                                    'type': 'study_name',
+                                                    'studyId': 'CATEGORICAL_VALUES'
                                                 }
                                             ]
                                         }
                                     },
                                     {
-                                        "name": "Male",
-                                        "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Male\\",
-                                        "studyId": "CATEGORICAL_VALUES",
-                                        "conceptCode": "CV:DEM:SEX:M",
-                                        "conceptPath": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Male\\",
-                                        "type": "CATEGORICAL_OPTION",
-                                        "visualAttributes": [
-                                            "LEAF",
-                                            "ACTIVE",
-                                            "CATEGORICAL_OPTION"
+                                        'name': 'Male',
+                                        'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Male\\',
+                                        'studyId': 'CATEGORICAL_VALUES',
+                                        'conceptCode': 'CV:DEM:SEX:M',
+                                        'conceptPath': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Gender\\Male\\',
+                                        'type': 'CATEGORICAL_OPTION',
+                                        'visualAttributes': [
+                                            'LEAF',
+                                            'ACTIVE',
+                                            'CATEGORICAL_OPTION'
                                         ],
-                                        "constraint": {
-                                            "type": "and",
-                                            "args": [
+                                        'constraint': {
+                                            'type': 'and',
+                                            'args': [
                                                 {
-                                                    "type": "concept",
-                                                    "conceptCode": "CV:DEM:SEX:M"
+                                                    'type': 'concept',
+                                                    'conceptCode': 'CV:DEM:SEX:M'
                                                 },
                                                 {
-                                                    "type": "study_name",
-                                                    "studyId": "CATEGORICAL_VALUES"
+                                                    'type': 'study_name',
+                                                    'studyId': 'CATEGORICAL_VALUES'
                                                 }
                                             ]
                                         }
@@ -443,27 +479,27 @@ GET_JSON_RESPONSES = {
                                 ]
                             },
                             {
-                                "name": "Race",
-                                "fullName": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Race\\",
-                                "studyId": "CATEGORICAL_VALUES",
-                                "conceptCode": "CV:DEM:RACE",
-                                "conceptPath": "\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Race\\",
-                                "type": "CATEGORICAL",
-                                "visualAttributes": [
-                                    "LEAF",
-                                    "ACTIVE",
-                                    "CATEGORICAL"
+                                'name': 'Race',
+                                'fullName': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Race\\',
+                                'studyId': 'CATEGORICAL_VALUES',
+                                'conceptCode': 'CV:DEM:RACE',
+                                'conceptPath': '\\Public Studies\\CATEGORICAL_VALUES\\Demography\\Race\\',
+                                'type': 'CATEGORICAL',
+                                'visualAttributes': [
+                                    'LEAF',
+                                    'ACTIVE',
+                                    'CATEGORICAL'
                                 ],
-                                "constraint": {
-                                    "type": "and",
-                                    "args": [
+                                'constraint': {
+                                    'type': 'and',
+                                    'args': [
                                         {
-                                            "type": "concept",
-                                            "conceptCode": "CV:DEM:RACE"
+                                            'type': 'concept',
+                                            'conceptCode': 'CV:DEM:RACE'
                                         },
                                         {
-                                            "type": "study_name",
-                                            "studyId": "CATEGORICAL_VALUES"
+                                            'type': 'study_name',
+                                            'studyId': 'CATEGORICAL_VALUES'
                                         }
                                     ]
                                 }

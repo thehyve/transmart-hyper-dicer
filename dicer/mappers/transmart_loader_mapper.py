@@ -1,17 +1,18 @@
-from transmart_loader.transmart import DataCollection
+from transmart_loader.console import Console
+from transmart_loader.transmart import DataCollection, Concept, Visit
 
-from dicer.mapper_helper import *
+from dicer.mappers.mapper_helper import *
+from dicer.mappers.observation_mapper import ObservationMapper
+from dicer.mappers.ontology_mapper import OntologyMapper
+from dicer.mappers.patient_mapper import PatientMapper
 from dicer.query_results import QueryResults
-from dicer.transmart \
-    import ConceptDimensionElement, PatientDimensionElement, \
-    StudyDimensionElement, TrialVisitDimensionElement, \
-    VisitDimensionElement
+from dicer.transmart import StudyDimensionElement, TrialVisitDimensionElement
 
 
 class TransmartLoaderMapper:
-    '''
-    Transmart query results to transmart-loader mapping
-    '''
+    """
+    Transmart query results to transmart-loader objects mapping
+    """
     def __init__(self):
         self.concepts: List[Concept] = []
         self.modifiers: List[Modifier] = []
@@ -25,14 +26,13 @@ class TransmartLoaderMapper:
         self.relation_types = []
         self.relations = []
 
-    @staticmethod
-    def _map_objects(objects, mapping_method, **kwargs):
-        return list(map(lambda x: mapping_method(x, kwargs), objects))
-
     def map_query_results(self, query_results: QueryResults) -> DataCollection:
 
-        patient_objects = query_results.observations.dimensionElements.get('patient', [])
-        self.patients = list(map(lambda x: map_patient(PatientDimensionElement(**x)), patient_objects))
+        patient_mapper = PatientMapper()
+        self.patients = patient_mapper.map_patients(query_results.observations.dimensionElements.get('patient', []))
+        self.relation_types = list(map(lambda x: map_relation_type(x), query_results.relation_types.relationTypes))
+        self.relations = patient_mapper.map_patient_relations(query_results.relations.relations, self.relation_types)
+        self.visits = patient_mapper.map_patient_visits(query_results.observations.dimensionElements['visit'])
 
         dimension_objects = query_results.dimensions.dimensions
         modifier_objects = list(filter(lambda x: x.modifierCode, dimension_objects))
@@ -40,32 +40,21 @@ class TransmartLoaderMapper:
         self.dimensions = list(map(lambda x: map_dimension(x, self.modifiers), dimension_objects))
 
         study_objects = query_results.observations.dimensionElements.get('study', [])
-        all_studies = query_results.studies.studies
-        for study in all_studies:
+        for study in query_results.studies.studies:
             if study.studyId in list(map(lambda x: StudyDimensionElement(**x).name, study_objects)):
                 self.studies.append(map_study(study))
 
-        concept_objects = query_results.observations.dimensionElements.get('concept', [])
-        self.concepts = list(map(lambda x: map_concept(ConceptDimensionElement(**x)), concept_objects))
-        tree_node_objects = query_results.tree_nodes.tree_nodes
-        self.ontology = list(map(lambda x: map_tree_node(x, self.studies, self.concepts), tree_node_objects))
+        ontology_mapper = OntologyMapper(self.studies)
+        self.concepts = ontology_mapper.map_concepts(query_results.observations.dimensionElements.get('concept', []))
+        self.ontology = ontology_mapper.map_tree_nodes(query_results.tree_nodes.tree_nodes)
 
         trial_visit_objects = query_results.observations.dimensionElements.get('trial visit', [])
         self.trial_visits = list(
             map(lambda x: map_trial_visit(TrialVisitDimensionElement(**x), self.studies), trial_visit_objects))
 
-        visit_objects = query_results.observations.dimensionElements['visit']
-        self.visits = list(map(lambda x: map_visit(VisitDimensionElement(**x), self.patients), visit_objects))
-
-        relation_type_objects = query_results.relation_types.relationTypes
-        self.relation_types = list(map(lambda x: map_relation_type(x), relation_type_objects))
-
-        relation_objects = query_results.relations.relations
-        self.relations = list(map(lambda x: map_relation(x, self.patients, self.relation_types), relation_objects))
-
-        self.observations = map_observations(query_results.observations,
-                                             self.patients, self.concepts, self.visits, self.trial_visits,
-                                             self.modifiers)
+        observation_mapper = ObservationMapper(self.patients, self.concepts, self.visits, self.trial_visits,
+                                               self.modifiers)
+        self.observations = observation_mapper.map_observations(query_results.observations)
 
         return DataCollection(self.concepts,
                               self.modifiers,

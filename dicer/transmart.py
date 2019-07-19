@@ -125,7 +125,7 @@ class PatientDimensionElement(BaseModel):
     """
     Patient properties
     """
-    id: str
+    id: int
     sex: Sex
     subjectIds: Dict[str, str]
 
@@ -246,9 +246,9 @@ class Relation(BaseModel):
     """
     Binary relation between patients
     """
-    leftSubjectId: str
+    leftSubjectId: int
     relationTypeLabel: str
-    rightSubjectId: str
+    rightSubjectId: int
     biological: Optional[bool]
     shareHousehold: Optional[bool]
 

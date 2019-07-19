@@ -32,7 +32,8 @@ setup(
     author_email='ewelina@thehyve.nl',
     url='https://github.com/thehyve/transmart-hyper-dicer',
     packages=[
-        'dicer'
+        'dicer',
+        'dicer.mappers'
     ],
     entry_points={
         'console_scripts': ['transmart-hyper-dicer=dicer.main:main'],

@@ -34,7 +34,7 @@ class TransmartRestClient(object):
         response: dict = self.post(path, body)
         return Hypercube(**response)
 
-    def get_tree_nodes(self, depth=0, tags=True, counts=False):
+    def get_tree_nodes(self, depth=0, tags=True, counts=False) -> TreeNodes:
         """
         Get tree nodes call
         :param depth: maximum tree node depth
@@ -46,7 +46,7 @@ class TransmartRestClient(object):
         response: dict = self.get(path, depth=depth, tags=tags, counts=counts)
         return TreeNodes(**response)
 
-    def get_dimensions(self):
+    def get_dimensions(self) -> Dimensions:
         """
         Get all dimensions metadata
         :return: All dimensions
@@ -55,7 +55,7 @@ class TransmartRestClient(object):
         response: dict = self.get(path)
         return Dimensions(**response)
 
-    def get_studies(self):
+    def get_studies(self) -> Studies:
         """
         Get all studies call
         :return: All studies
@@ -64,7 +64,7 @@ class TransmartRestClient(object):
         response: dict = self.get(path)
         return Studies(**response)
 
-    def get_relation_types(self):
+    def get_relation_types(self) -> RelationTypes:
         """
         Get all relation types call
         :return: All relation types
@@ -73,7 +73,7 @@ class TransmartRestClient(object):
         response: dict = self.get(path)
         return RelationTypes(**response)
 
-    def get_relations(self):
+    def get_relations(self) -> Relations:
         """
         Get relations between patients call
         :return: Binary relation between patients

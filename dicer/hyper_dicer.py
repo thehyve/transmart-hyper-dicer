@@ -1,5 +1,3 @@
-import json
-import sys
 from pathlib import Path
 from typing import Dict
 
@@ -7,7 +5,7 @@ from transmart_loader.console import Console
 from transmart_loader.copy_writer import TransmartCopyWriter
 from transmart_loader.transmart import DataCollection
 
-from dicer.loader_mapper import TransmartLoaderMapper
+from dicer.mappers.transmart_loader_mapper import TransmartLoaderMapper
 from dicer.query_results import QueryResults
 from dicer.transmart_rest_client import TransmartRestClient, TransmartConfiguration
 
