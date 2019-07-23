@@ -1,9 +1,8 @@
-from typing import List
+from typing import List, Optional
 
-from transmart_loader.console import Console
 from transmart_loader.transmart import Concept, TreeNode, StudyNode, Study, ConceptNode
 
-from dicer.mappers.mapper_helper import observed_value_type_to_value_type, DataInconsistencyException
+from dicer.mappers.mapper_helper import observed_value_type_to_value_type
 from dicer.transmart import ConceptDimensionElement, Value, TreeNode as TreeNodeObject, ObservedValueType
 
 
@@ -25,33 +24,36 @@ class OntologyMapper:
             None
         )
 
-    def map_tree_node(self, tree_node: TreeNodeObject) -> TreeNode:
-
-        if tree_node.type is ObservedValueType.Study:
-            study = next(filter(lambda x: x.study_id == tree_node.studyId, self.studies), None)
-            if not study:
-                # skipping study node
-                return None
-            node = StudyNode(study)
-        elif tree_node.conceptCode:
-            concept_id = next(i for i, c in enumerate(self.concepts) if c.concept_code == tree_node.conceptCode)
-            self.concepts[concept_id].value_type = observed_value_type_to_value_type(tree_node.type)
-            node = ConceptNode(self.concepts[concept_id])
-        else:
-            node = TreeNode(tree_node.name)
-
-        for child in tree_node.children:
-            try:
-                child_node = self.map_tree_node(TreeNodeObject(**child))
+    def map_tree_node_children(self, node: TreeNode, tree_node_obj):
+        for child in tree_node_obj.children:
+            child_node = self.map_tree_node(TreeNodeObject(**child))
+            if child_node:
                 node.add_child(child_node)
-            except Exception as e:
-                Console.info('Tree node mapping error: {}'. format(e))
 
+    def map_concept_node(self, tree_node_obj: TreeNodeObject) -> Optional[ConceptNode]:
+        concept_id = next((i for i, c in enumerate(self.concepts)
+                           if c.concept_code == tree_node_obj.conceptCode), None)
+        if concept_id:
+            self.concepts[concept_id].value_type = observed_value_type_to_value_type(tree_node_obj.type)
+            return ConceptNode(self.concepts[concept_id])
+        return None
+
+    def map_study_node(self, tree_node_obj: TreeNodeObject) -> Optional[StudyNode]:
+        study = next(filter(lambda x: x.study_id == tree_node_obj.studyId, self.studies), None)
+        if study:
+            return StudyNode(study)
+        return None
+
+    def map_tree_node(self, tree_node_obj: TreeNodeObject) -> TreeNode:
+        if tree_node_obj.type is ObservedValueType.Study:
+            node = self.map_study_node(tree_node_obj)
+        elif tree_node_obj.conceptCode:
+            node = self.map_concept_node(tree_node_obj)
+        else:
+            node = TreeNode(tree_node_obj.name)
+        if node:
+            self.map_tree_node_children(node, tree_node_obj)
         return node
-
-    def map_concepts(self, concepts_dim_elements: List[Value]) -> List[Concept]:
-        self.concepts = list(map(lambda x: self.map_concept(ConceptDimensionElement(**x)), concepts_dim_elements))
-        return self.concepts
 
     def map_tree_nodes(self, tree_node_objects: List[TreeNodeObject]):
         tree_nodes = []
@@ -60,3 +62,7 @@ class OntologyMapper:
             if node:
                 tree_nodes.append(node)
         return tree_nodes
+
+    def map_concepts(self, concepts_dim_elements: List[Value]) -> List[Concept]:
+        self.concepts = list(map(lambda x: self.map_concept(ConceptDimensionElement(**x)), concepts_dim_elements))
+        return self.concepts
