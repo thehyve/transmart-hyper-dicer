@@ -1,4 +1,6 @@
-from transmart_loader.transmart import DataCollection, Concept, Visit
+from transmart_loader.transmart import DataCollection, Concept as TLConcept, Visit as TLVisit, TreeNode as TLTreeNode, \
+    Patient as TLPatient, Observation as TLObservation, Relation as TLRelation, Modifier as TLModifier, \
+    Dimension as TLDimension, Study as TLStudy, TrialVisit as TLTrialVisit, RelationType as TLRelationType
 
 from dicer.mappers.mapper_helper import *
 from dicer.mappers.observation_mapper import ObservationMapper
@@ -13,17 +15,17 @@ class TransmartLoaderMapper:
     Transmart query results to transmart-loader objects mapping
     """
     def __init__(self):
-        self.concepts: List[Concept] = []
-        self.modifiers: List[Modifier] = []
-        self.dimensions: List[Dimension] = []
-        self.studies: List[Study] = []
-        self.trial_visits: List[TrialVisit] = []
-        self.visits: List[Visit] = []
-        self.ontology = []
-        self.patients = []
-        self.observations = []
-        self.relation_types = []
-        self.relations = []
+        self.concepts: List[TLConcept] = []
+        self.modifiers: List[TLModifier] = []
+        self.dimensions: List[TLDimension] = []
+        self.studies: List[TLStudy] = []
+        self.trial_visits: List[TLTrialVisit] = []
+        self.visits: List[TLVisit] = []
+        self.ontology: List[TLTreeNode] = []
+        self.patients: List[TLPatient] = []
+        self.observations: List[TLObservation] = []
+        self.relation_types: List[TLRelationType] = []
+        self.relations: List[TLRelation] = []
 
     def map_query_results(self, query_results: QueryResults) -> DataCollection:
 

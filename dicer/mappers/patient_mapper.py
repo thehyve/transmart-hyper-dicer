@@ -1,9 +1,10 @@
 from typing import Dict, List
 
-from transmart_loader.transmart import Patient, IdentifierMapping, Relation, RelationType, Visit
+from transmart_loader.transmart import Patient as TLPatient, IdentifierMapping as TLIdentifierMapping, \
+    Relation as TLRelation, RelationType as TLRelationType, Visit as TLVisit
 
 from dicer.mappers.mapper_helper import DataInconsistencyException
-from dicer.transmart import PatientDimensionElement, Relation as RelationObject, Value, VisitDimensionElement
+from dicer.transmart import PatientDimensionElement, Relation, Value, VisitDimensionElement
 
 
 class PatientMapper:
@@ -15,7 +16,7 @@ class PatientMapper:
         self.patient_id_to_patient_identifier: Dict[int, str] = {}
         self.patients = []
 
-    def map_patient(self, patient_dimension_element: PatientDimensionElement) -> Patient:
+    def map_patient(self, patient_dimension_element: PatientDimensionElement) -> TLPatient:
         if not patient_dimension_element.subjectIds or 'SUBJ_ID' not in patient_dimension_element.subjectIds:
             raise DataInconsistencyException('Missing SUBJ_ID mapping for patient with id {}'
                                              .format(patient_dimension_element.id))
@@ -23,19 +24,19 @@ class PatientMapper:
         self.patient_id_to_patient_identifier[
             patient_dimension_element.id] = patient_dimension_element.subjectIds['SUBJ_ID']
 
-        return Patient(
+        return TLPatient(
             patient_dimension_element.subjectIds['SUBJ_ID'],
             patient_dimension_element.sex,
-            list(map(lambda kv: IdentifierMapping(kv[0], kv[1]), patient_dimension_element.subjectIds.items()))
+            list(map(lambda kv: TLIdentifierMapping(kv[0], kv[1]), patient_dimension_element.subjectIds.items()))
         )
 
-    def map_patient_relation(self, relation: RelationObject, relation_types: List[RelationType],
-                             left: Patient, right: Patient) -> Relation:
+    def map_patient_relation(self, relation: Relation, relation_types: List[TLRelationType],
+                             left: TLPatient, right: TLPatient) -> TLRelation:
         relation_type = next((x for x in relation_types if x.label == relation.relationTypeLabel), None)
         if not relation_type:
             raise DataInconsistencyException('Relation {} does not exist.'.format(relation.relationTypeLabel))
 
-        return Relation(
+        return TLRelation(
             left,
             relation_type,
             right,
@@ -43,7 +44,7 @@ class PatientMapper:
             relation.shareHousehold
         )
 
-    def map_patient_visit(self, visit: VisitDimensionElement) -> Visit:
+    def map_patient_visit(self, visit: VisitDimensionElement) -> TLVisit:
         if not visit.encounterIds or 'VISIT_ID' not in visit.encounterIds:
             raise DataInconsistencyException('Missing visit encounter ID')
         visit_encounter_id = visit.encounterIds['VISIT_ID']
@@ -53,7 +54,7 @@ class PatientMapper:
         if not patient:
             raise DataInconsistencyException('Missing patient for visit {}'.format(visit_encounter_id))
 
-        return Visit(
+        return TLVisit(
             patient,
             visit_encounter_id,
             visit.activeStatusCd,
@@ -62,13 +63,13 @@ class PatientMapper:
             visit.inoutCd,
             visit.locationCd,
             visit.lengthOfStay,
-            list(map(lambda kv: IdentifierMapping(kv[0], kv[1]), visit.encounterIds.items()))
+            list(map(lambda kv: TLIdentifierMapping(kv[0], kv[1]), visit.encounterIds.items()))
         )
 
-    def map_patient_visits(self, visit_dim_elements: List[Value]) -> List[Visit]:
+    def map_patient_visits(self, visit_dim_elements: List[Value]) -> List[TLVisit]:
         return list(map(lambda x: self.map_patient_visit(VisitDimensionElement(**x)), visit_dim_elements))
 
-    def map_patient_relations(self, relation_objects: List[RelationObject], relation_types: List[RelationType]):
+    def map_patient_relations(self, relation_objects: List[Relation], relation_types: List[TLRelationType]):
         relations = []
         for relation_object in relation_objects:
             left = next((x for x in self.patients if x.identifier == self.patient_id_to_patient_identifier.get(
@@ -83,7 +84,7 @@ class PatientMapper:
 
         return relations
 
-    def map_patients(self, patient_dim_elements: List[Value]) -> List[Patient]:
+    def map_patients(self, patient_dim_elements: List[Value]) -> List[TLPatient]:
         self.patients = list(map(lambda x: self.map_patient(PatientDimensionElement(**x)),
                                  patient_dim_elements))
         return self.patients

@@ -1,7 +1,9 @@
-from typing import List
+from typing import List, Optional
 
-from transmart_loader.transmart import Concept, Patient, Visit, TrialVisit, Modifier, Observation, \
-    ObservationMetadata, CategoricalValue, NumericalValue
+from transmart_loader.transmart import Concept as TLConcept, Patient as TLPatient, Visit as TLVisit, \
+    TrialVisit as TLTrialVisit, Modifier as TLModifier, Observation as TLObservation, \
+    ObservationMetadata as TLObservationMetadata, CategoricalValue as TLCategoricalValue, \
+    NumericalValue as TLNumericalValue, Value as TLValue
 
 from dicer.mappers.mapper_helper import value_by_value_type
 from dicer.transmart import ConceptDimensionElement, Hypercube, DimensionDeclaration, PatientDimensionElement, \
@@ -14,11 +16,11 @@ class ObservationMapper:
     """
 
     def __init__(self,
-                 patients: List[Patient],
-                 concepts: List[Concept],
-                 visits: List[Visit],
-                 trial_visits: List[TrialVisit],
-                 modifiers: List[Modifier]):
+                 patients: List[TLPatient],
+                 concepts: List[TLConcept],
+                 visits: List[TLVisit],
+                 trial_visits: List[TLTrialVisit],
+                 modifiers: List[TLModifier]):
         self.patients = patients
         self.concepts = concepts
         self.visits = visits
@@ -30,14 +32,14 @@ class ObservationMapper:
         return next(i for i, dim in enumerate(dimensions) if dim.name == name)
 
     @staticmethod
-    def get_observation_value(cell: Cell):
-        value = CategoricalValue(cell.stringValue) if cell.stringValue else NumericalValue(
+    def get_observation_value(cell: Cell) -> TLValue:
+        value = TLCategoricalValue(cell.stringValue) if cell.stringValue else TLNumericalValue(
             cell.numericValue)  # TODO DateValue?
         return value
 
     def get_observation_metadata(self, cell: Cell, hypercube: Hypercube,
                                  indexed_dimensions: List[DimensionDeclaration],
-                                 modifier_dimensions: List[DimensionDeclaration]):
+                                 modifier_dimensions: List[DimensionDeclaration]) -> Optional[TLObservationMetadata]:
         metadata = None
         for modifier_dim in modifier_dimensions:
             metadata_values = dict()
@@ -47,10 +49,13 @@ class ObservationMapper:
                 modifier = next(filter(lambda x: x.modifier_code == modifier_dim.modifierCode, self.modifiers))
                 modifier_value = hypercube.dimensionElements[modifier_dim.name][modifier_dimension_element_id]
                 metadata_values[modifier] = value_by_value_type(modifier_value, modifier.value_type)
-                metadata = ObservationMetadata(metadata_values)
+                metadata = TLObservationMetadata(metadata_values)
         return metadata
 
-    def get_observation_trial_visit(self, cell: Cell, hypercube: Hypercube, trial_visits_dimension_id: int):
+    def get_observation_trial_visit(self,
+                                    cell: Cell,
+                                    hypercube: Hypercube,
+                                    trial_visits_dimension_id: int) -> Optional[TLTrialVisit]:
         trial_visit = None
         trial_visit_dim_element_id = cell.dimensionIndexes[trial_visits_dimension_id]
         if trial_visit_dim_element_id is not None:
@@ -62,7 +67,7 @@ class ObservationMapper:
                                       self.trial_visits))
         return trial_visit
 
-    def get_observation_visit(self, cell: Cell, hypercube: Hypercube, visit_dimension_id: int):
+    def get_observation_visit(self, cell: Cell, hypercube: Hypercube, visit_dimension_id: int) -> Optional[TLVisit]:
         visit = None
         visit_dim_element_id = cell.dimensionIndexes[visit_dimension_id]
         if visit_dim_element_id is not None:
@@ -70,19 +75,19 @@ class ObservationMapper:
             visit = next(filter(lambda x: x.identifier == visit_dim_element.encounterIds['VISIT_ID'], self.visits))
         return visit
 
-    def get_observation_concept(self, cell: Cell, hypercube: Hypercube, concept_dimension_id: int):
+    def get_observation_concept(self, cell: Cell, hypercube: Hypercube, concept_dimension_id: int) -> TLConcept:
         concept_dim_element = ConceptDimensionElement(
             **hypercube.dimensionElements['concept'][cell.dimensionIndexes[concept_dimension_id]])
         concept = next(filter(lambda x: x.concept_code == concept_dim_element.conceptCode, self.concepts))
         return concept
 
-    def get_observation_patient(self, cell: Cell, hypercube: Hypercube, patient_dimension_id: int):
+    def get_observation_patient(self, cell: Cell, hypercube: Hypercube, patient_dimension_id: int) -> TLPatient:
         patient_dim_element = PatientDimensionElement(
             **hypercube.dimensionElements['patient'][cell.dimensionIndexes[patient_dimension_id]])
         patient = next(filter(lambda x: x.identifier == patient_dim_element.subjectIds['SUBJ_ID'], self.patients))
         return patient
 
-    def map_observations(self, hypercube: Hypercube) -> List[Observation]:
+    def map_observations(self, hypercube: Hypercube) -> List[TLObservation]:
         observations = []
         inline_dimensions = list(filter(lambda d: d.inline, hypercube.dimensionDeclarations))
         indexed_dimensions = list(filter(lambda d: d not in inline_dimensions, list(hypercube.dimensionDeclarations)))
@@ -106,7 +111,7 @@ class ObservationMapper:
             observation_metadata = self.get_observation_metadata(cell, hypercube,
                                                                  indexed_dimensions, modifier_dimensions)
 
-            observations.append(Observation(
+            observations.append(TLObservation(
                 observation_patient,
                 observation_concept,
                 observation_visit,
