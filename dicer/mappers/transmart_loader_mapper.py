@@ -1,4 +1,3 @@
-from transmart_loader.console import Console
 from transmart_loader.transmart import DataCollection, Concept, Visit
 
 from dicer.mappers.mapper_helper import *
@@ -55,7 +54,6 @@ class TransmartLoaderMapper:
         observation_mapper = ObservationMapper(self.patients, self.concepts, self.visits, self.trial_visits,
                                                self.modifiers)
         self.observations = observation_mapper.map_observations(query_results.observations)
-
         return DataCollection(self.concepts,
                               self.modifiers,
                               self.dimensions,

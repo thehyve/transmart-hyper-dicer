@@ -33,7 +33,7 @@ class OntologyMapper:
     def map_concept_node(self, tree_node_obj: TreeNodeObject) -> Optional[ConceptNode]:
         concept_id = next((i for i, c in enumerate(self.concepts)
                            if c.concept_code == tree_node_obj.conceptCode), None)
-        if concept_id:
+        if concept_id is not None:
             self.concepts[concept_id].value_type = observed_value_type_to_value_type(tree_node_obj.type)
             return ConceptNode(self.concepts[concept_id])
         return None
@@ -51,7 +51,7 @@ class OntologyMapper:
             node = self.map_concept_node(tree_node_obj)
         else:
             node = TreeNode(tree_node_obj.name)
-        if node:
+        if node is not None:
             self.map_tree_node_children(node, tree_node_obj)
         return node
 
@@ -59,7 +59,7 @@ class OntologyMapper:
         tree_nodes = []
         for node_object in tree_node_objects:
             node = self.map_tree_node(node_object)
-            if node:
+            if node is not None:
                 tree_nodes.append(node)
         return tree_nodes
 
