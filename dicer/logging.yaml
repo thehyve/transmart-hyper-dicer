@@ -2,7 +2,9 @@ version: 1
 disable_existing_loggers: False
 formatters:
   default:
-    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format: "%(asctime)s - %(levelname)s - %(message)s"
+  console:
+    format: "%(levelname)s - %(message)s"
 handlers:
   default_info:
     class: logging.handlers.TimedRotatingFileHandler
@@ -23,7 +25,7 @@ handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: default
+    formatter: console
 
 root:
     level: INFO
