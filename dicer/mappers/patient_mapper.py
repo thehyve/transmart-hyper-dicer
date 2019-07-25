@@ -13,22 +13,25 @@ class PatientMapper:
     """
 
     def __init__(self):
-        self.patient_id_to_patient_identifier: Dict[int, str] = {}
-        self.patients = []
+        self.patient_id_to_patient: Dict[int, TLPatient] = {}
+
+    @staticmethod
+    def identifier_mappings_from_id_map(id_map: Dict[str, str]):
+        return list(map(lambda kv: TLIdentifierMapping(kv[0], kv[1]), id_map.items()))
 
     def map_patient(self, patient_dimension_element: PatientDimensionElement) -> TLPatient:
         if not patient_dimension_element.subjectIds or 'SUBJ_ID' not in patient_dimension_element.subjectIds:
             raise DataInconsistencyException('Missing SUBJ_ID mapping for patient with id {}'
                                              .format(patient_dimension_element.id))
 
-        self.patient_id_to_patient_identifier[
-            patient_dimension_element.id] = patient_dimension_element.subjectIds['SUBJ_ID']
-
-        return TLPatient(
+        patient = TLPatient(
             patient_dimension_element.subjectIds['SUBJ_ID'],
             patient_dimension_element.sex,
-            list(map(lambda kv: TLIdentifierMapping(kv[0], kv[1]), patient_dimension_element.subjectIds.items()))
+            self.identifier_mappings_from_id_map(patient_dimension_element.subjectIds)
         )
+        self.patient_id_to_patient[patient_dimension_element.id] = patient
+
+        return patient
 
     def map_patient_relation(self, relation: Relation, relation_types: List[TLRelationType],
                              left: TLPatient, right: TLPatient) -> TLRelation:
@@ -49,8 +52,7 @@ class PatientMapper:
             raise DataInconsistencyException('Missing visit encounter ID')
         visit_encounter_id = visit.encounterIds['VISIT_ID']
 
-        patient = next(filter(lambda x: x.identifier == self.patient_id_to_patient_identifier[visit.patientId],
-                              self.patients), None)
+        patient = self.patient_id_to_patient.get(visit.patientId)
         if not patient:
             raise DataInconsistencyException('Missing patient for visit {}'.format(visit_encounter_id))
 
@@ -63,19 +65,17 @@ class PatientMapper:
             visit.inoutCd,
             visit.locationCd,
             visit.lengthOfStay,
-            list(map(lambda kv: TLIdentifierMapping(kv[0], kv[1]), visit.encounterIds.items()))
+            self.identifier_mappings_from_id_map(visit.encounterIds)
         )
 
     def map_patient_visits(self, visit_dim_elements: List[Value]) -> List[TLVisit]:
         return list(map(lambda x: self.map_patient_visit(VisitDimensionElement(**x)), visit_dim_elements))
 
     def map_patient_relations(self, relation_objects: List[Relation], relation_types: List[TLRelationType]):
-        relations = []
+        relations: List[TLRelation] = []
         for relation_object in relation_objects:
-            left = next((x for x in self.patients if x.identifier == self.patient_id_to_patient_identifier.get(
-                relation_object.leftSubjectId)), None)
-            right = next((x for x in self.patients if x.identifier == self.patient_id_to_patient_identifier.get(
-                relation_object.rightSubjectId)), None)
+            left = self.patient_id_to_patient.get(relation_object.leftSubjectId)
+            right = self.patient_id_to_patient.get(relation_object.rightSubjectId)
 
             if not left or not right:
                 continue
@@ -85,6 +85,4 @@ class PatientMapper:
         return relations
 
     def map_patients(self, patient_dim_elements: List[Value]) -> List[TLPatient]:
-        self.patients = list(map(lambda x: self.map_patient(PatientDimensionElement(**x)),
-                                 patient_dim_elements))
-        return self.patients
+        return list(map(lambda x: self.map_patient(PatientDimensionElement(**x)), patient_dim_elements))

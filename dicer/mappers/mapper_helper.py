@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from transmart_loader.transmart import ValueType as TLValueType, RelationType as TLRelationType, \
     Dimension as TLDimension, Modifier as TLModifier, Study as TLStudy, TrialVisit as TLTrialVisit, \
@@ -6,7 +6,7 @@ from transmart_loader.transmart import ValueType as TLValueType, RelationType as
     DateValue as TLDateValue, TextValue as TLTextValue, DimensionType as TLDimensionType
 
 from dicer.transmart import RelationType, Dimension as DimensionObject, Study, TrialVisitDimensionElement, \
-    ValueType, ObservedValueType, DimensionType
+    ValueType, ObservedValueType, DimensionType, StudyDimensionElement, Value
 
 
 class DataInconsistencyException(Exception):
@@ -62,7 +62,7 @@ def map_relation_type(relation_type: RelationType) -> TLRelationType:
     )
 
 
-def map_modifiers(modifier_dimension: DimensionObject) -> TLModifier:
+def map_modifier(modifier_dimension: DimensionObject) -> TLModifier:
     return TLModifier(
         modifier_dimension.modifierCode,
         modifier_dimension.name,
@@ -81,8 +81,8 @@ def map_dimension(dimension: DimensionObject, modifiers: List[TLModifier]) -> TL
     )
 
 
-def map_trial_visit(trial_visit: TrialVisitDimensionElement, studies: List[TLStudy]) -> TLTrialVisit:
-    study = next(filter(lambda x: x.study_id == trial_visit.studyId, studies))
+def map_trial_visit(trial_visit: TrialVisitDimensionElement, study_id_to_study: Dict[str, TLStudy]) -> TLTrialVisit:
+    study = study_id_to_study.get(trial_visit.studyId)
     return TLTrialVisit(
         study,
         trial_visit.relTimeLabel,
@@ -96,3 +96,11 @@ def map_study(study: Study) -> TLStudy:
         study.studyId,
         study.studyId
     )
+
+
+def get_study_id_to_study_dict(study_dim_elements: List[Value], all_studies: List[Study]):
+    study_id_to_study: Dict[str, TLStudy] = {}
+    for study in all_studies:
+        if study.studyId in list(map(lambda x: StudyDimensionElement(**x).name, study_dim_elements)):
+            study_id_to_study[study.studyId] = map_study(study)
+    return study_id_to_study

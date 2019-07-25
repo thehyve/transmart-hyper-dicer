@@ -1,69 +1,57 @@
-from transmart_loader.transmart import DataCollection, Concept as TLConcept, Visit as TLVisit, TreeNode as TLTreeNode, \
-    Patient as TLPatient, Observation as TLObservation, Relation as TLRelation, Modifier as TLModifier, \
-    Dimension as TLDimension, Study as TLStudy, TrialVisit as TLTrialVisit, RelationType as TLRelationType
+from transmart_loader.transmart import DataCollection
 
 from dicer.mappers.mapper_helper import *
 from dicer.mappers.observation_mapper import ObservationMapper
 from dicer.mappers.ontology_mapper import OntologyMapper
 from dicer.mappers.patient_mapper import PatientMapper
 from dicer.query_results import QueryResults
-from dicer.transmart import StudyDimensionElement, TrialVisitDimensionElement
+from dicer.transmart import TrialVisitDimensionElement
 
 
 class TransmartLoaderMapper:
     """
     Transmart query results to transmart-loader objects mapping
     """
-    def __init__(self):
-        self.concepts: List[TLConcept] = []
-        self.modifiers: List[TLModifier] = []
-        self.dimensions: List[TLDimension] = []
-        self.studies: List[TLStudy] = []
-        self.trial_visits: List[TLTrialVisit] = []
-        self.visits: List[TLVisit] = []
-        self.ontology: List[TLTreeNode] = []
-        self.patients: List[TLPatient] = []
-        self.observations: List[TLObservation] = []
-        self.relation_types: List[TLRelationType] = []
-        self.relations: List[TLRelation] = []
 
-    def map_query_results(self, query_results: QueryResults) -> DataCollection:
+    @staticmethod
+    def map_query_results(query_results: QueryResults) -> DataCollection:
 
         patient_mapper = PatientMapper()
-        self.patients = patient_mapper.map_patients(query_results.observations.dimensionElements.get('patient', []))
-        self.relation_types = list(map(lambda x: map_relation_type(x), query_results.relation_types.relationTypes))
-        self.relations = patient_mapper.map_patient_relations(query_results.relations.relations, self.relation_types)
-        self.visits = patient_mapper.map_patient_visits(query_results.observations.dimensionElements['visit'])
+        patients = patient_mapper.map_patients(query_results.observations.dimensionElements.get('patient', []))
+        relation_types = list(map(lambda x: map_relation_type(x), query_results.relation_types.relationTypes))
+        relations = patient_mapper.map_patient_relations(query_results.relations.relations, relation_types)
+        visits = patient_mapper.map_patient_visits(query_results.observations.dimensionElements['visit'])
 
         dimension_objects = query_results.dimensions.dimensions
         modifier_objects = list(filter(lambda x: x.modifierCode, dimension_objects))
-        self.modifiers = list(map(lambda x: map_modifiers(x), modifier_objects))
-        self.dimensions = list(map(lambda x: map_dimension(x, self.modifiers), dimension_objects))
+        modifiers = list(map(lambda x: map_modifier(x), modifier_objects))
+        dimensions = list(map(lambda x: map_dimension(x, modifiers), dimension_objects))
 
-        study_objects = query_results.observations.dimensionElements.get('study', [])
-        for study in query_results.studies.studies:
-            if study.studyId in list(map(lambda x: StudyDimensionElement(**x).name, study_objects)):
-                self.studies.append(map_study(study))
+        study_id_to_study = get_study_id_to_study_dict(query_results.observations.dimensionElements['study'],
+                                                       query_results.studies.studies)
+        studies = list(study_id_to_study.values())
 
-        ontology_mapper = OntologyMapper(self.studies)
-        self.concepts = ontology_mapper.map_concepts(query_results.observations.dimensionElements.get('concept', []))
-        self.ontology = ontology_mapper.map_tree_nodes(query_results.tree_nodes.tree_nodes)
+        ontology_mapper = OntologyMapper(study_id_to_study, query_results.observations.dimensionElements['concept'])
+        ontology = ontology_mapper.map_tree_nodes(query_results.tree_nodes.tree_nodes)
+        concepts = list(ontology_mapper.concept_code_to_concept.values())
 
-        trial_visit_objects = query_results.observations.dimensionElements.get('trial visit', [])
-        self.trial_visits = list(
-            map(lambda x: map_trial_visit(TrialVisitDimensionElement(**x), self.studies), trial_visit_objects))
+        trial_visit_dim_elements = query_results.observations.dimensionElements.get('trial visit', [])
+        trial_visits = list(
+            map(lambda x: map_trial_visit(TrialVisitDimensionElement(**x), study_id_to_study), trial_visit_dim_elements))
 
-        observation_mapper = ObservationMapper(self.patients, self.concepts, self.visits, self.trial_visits,
-                                               self.modifiers)
-        self.observations = observation_mapper.map_observations(query_results.observations)
-        return DataCollection(self.concepts,
-                              self.modifiers,
-                              self.dimensions,
-                              self.studies,
-                              self.trial_visits,
-                              self.visits,
-                              self.ontology,
-                              self.patients,
-                              self.observations,
-                              self.relation_types,
-                              self.relations)
+        observation_mapper = ObservationMapper(patient_mapper.patient_id_to_patient,
+                                               ontology_mapper.concept_code_to_concept,
+                                               visits, trial_visits, modifiers)
+        observations = observation_mapper.map_observations(query_results.observations)
+
+        return DataCollection(concepts,
+                              modifiers,
+                              dimensions,
+                              studies,
+                              trial_visits,
+                              visits,
+                              ontology,
+                              patients,
+                              observations,
+                              relation_types,
+                              relations)

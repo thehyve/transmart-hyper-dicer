@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from transmart_loader.transmart import Concept as TLConcept, TreeNode as TLTreeNode, StudyNode as TLStudyNode, \
     Study as TLStudy, ConceptNode as TLConceptNode
@@ -12,18 +12,23 @@ class OntologyMapper:
     Map concepts and tree nodes from query results to transmart-loader objects
     """
 
-    def __init__(self, studies: List[TLStudy]):
-        self.studies = studies
-        self.concepts = []
+    def __init__(self, study_id_to_study: Dict[str, TLStudy], concept_dim_elements: List[Value]):
+        self.study_id_to_study = study_id_to_study
+        self.concept_code_to_concept: Dict[str, TLConcept] = {}
+        self.create_concept_to_concept_code_dict(concept_dim_elements)
 
-    @staticmethod
-    def map_concept(concept: ConceptDimensionElement) -> TLConcept:
-        return TLConcept(
-            concept.conceptCode,
-            concept.name,
-            concept.conceptPath,
+    def create_concept_to_concept_code_dict(self, concepts_dim_elements: List[Value]):
+        for concepts_dim_element in concepts_dim_elements:
+            self.map_concept(ConceptDimensionElement(**concepts_dim_element))
+
+    def map_concept(self, concept_dim_element: ConceptDimensionElement):
+        concept = TLConcept(
+            concept_dim_element.conceptCode,
+            concept_dim_element.name,
+            concept_dim_element.conceptPath,
             None
         )
+        self.concept_code_to_concept[concept_dim_element.conceptCode] = concept
 
     def map_tree_node_children(self, node: TLTreeNode, tree_node_obj):
         for child in tree_node_obj.children:
@@ -32,15 +37,15 @@ class OntologyMapper:
                 node.add_child(child_node)
 
     def map_concept_node(self, tree_node_obj: TreeNode) -> Optional[TLConceptNode]:
-        concept_id = next((i for i, c in enumerate(self.concepts)
-                           if c.concept_code == tree_node_obj.conceptCode), None)
-        if concept_id is not None:
-            self.concepts[concept_id].value_type = observed_value_type_to_value_type(tree_node_obj.type)
-            return TLConceptNode(self.concepts[concept_id])
+        concept = self.concept_code_to_concept.get(tree_node_obj.conceptCode)
+        if concept is not None:
+            # update concept value type (not available in ConceptDimensionElement)
+            concept.value_type = observed_value_type_to_value_type(tree_node_obj.type)
+            return TLConceptNode(concept)
         return None
 
     def map_study_node(self, tree_node_obj: TreeNode) -> Optional[TLStudyNode]:
-        study = next(filter(lambda x: x.study_id == tree_node_obj.studyId, self.studies), None)
+        study = self.study_id_to_study.get(tree_node_obj.studyId)
         if study:
             return TLStudyNode(study)
         return None
@@ -56,14 +61,10 @@ class OntologyMapper:
             self.map_tree_node_children(node, tree_node_obj)
         return node
 
-    def map_tree_nodes(self, tree_node_objects: List[TreeNode]):
-        tree_nodes = []
+    def map_tree_nodes(self, tree_node_objects: List[TreeNode]) -> List[TLTreeNode]:
+        tree_nodes: List[TLTreeNode] = []
         for node_object in tree_node_objects:
             node = self.map_tree_node(node_object)
             if node is not None:
                 tree_nodes.append(node)
         return tree_nodes
-
-    def map_concepts(self, concepts_dim_elements: List[Value]) -> List[TLConcept]:
-        self.concepts = list(map(lambda x: self.map_concept(ConceptDimensionElement(**x)), concepts_dim_elements))
-        return self.concepts
