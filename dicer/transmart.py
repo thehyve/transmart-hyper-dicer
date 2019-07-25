@@ -167,7 +167,7 @@ class TrialVisitDimensionElement(BaseModel):
     """
     relTimeLabel: str
     relTimeUnit: Optional[str]
-    relTime: Optional[str]
+    relTime: Optional[int]
     studyId: str
 
 
