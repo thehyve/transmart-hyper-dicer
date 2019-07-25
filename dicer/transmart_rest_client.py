@@ -1,31 +1,86 @@
-import requests
 import logging
 
-from .keycloak_rest_client import KeycloakRestClient
+import requests
+from pydantic import BaseModel
 
-from .config import transmart_config
+from dicer.transmart import Hypercube, Dimensions, TreeNodes, Studies, RelationTypes, Relations
+from .keycloak_rest_client import KeycloakRestClient, KeycloakConfiguration
 
 
 class TransmartException(Exception):
     pass
 
 
+class TransmartConfiguration(BaseModel):
+    url: str
+    verify: bool = True
+    keycloak_config: KeycloakConfiguration
+
+
 class TransmartRestClient(object):
 
-    def __init__(self):
-        self.url = transmart_config.get("host")
-        self.verify = transmart_config.get("verify_cert")
-        self.keycloak = KeycloakRestClient()
+    def __init__(self, config: TransmartConfiguration):
+        self.config = config
+        self.keycloak = KeycloakRestClient(config.keycloak_config)
 
-    def get_observations(self, constraint):
+    def get_observations(self, constraint: dict) -> Hypercube:
         """
         Get observations call
         :param constraint: transmart API constraint to request
-        :return: response body (json) of the observation call of transmart API
+        :return: The Hypercube response of the observations call of the transmart API
         """
         path = '/v2/observations'
         body = {'type': 'clinical', 'constraint': constraint}
-        return self.post(path, body)
+        response: dict = self.post(path, body)
+        return Hypercube(**response)
+
+    def get_tree_nodes(self, depth=0, tags=True, counts=False) -> TreeNodes:
+        """
+        Get tree nodes call
+        :param depth: maximum tree node depth
+        :param tags: include metadata tags
+        :param counts: include counts
+        :return: The response of the tree nodes call of the transmart API
+        """
+        path = '/v2/tree_nodes'
+        response: dict = self.get(path, depth=depth, tags=tags, counts=counts)
+        return TreeNodes(**response)
+
+    def get_dimensions(self) -> Dimensions:
+        """
+        Get all dimensions metadata
+        :return: All dimensions
+        """
+        path = '/v2/dimensions'
+        response: dict = self.get(path)
+        return Dimensions(**response)
+
+    def get_studies(self) -> Studies:
+        """
+        Get all studies call
+        :return: All studies
+        """
+        path = '/v2/studies'
+        response: dict = self.get(path)
+        return Studies(**response)
+
+    def get_relation_types(self) -> RelationTypes:
+        """
+        Get all relation types call
+        :return: All relation types
+        """
+        path = '/v2/pedigree/relation_types'
+        response: dict = self.get(path)
+        return RelationTypes(**response)
+
+    def get_relations(self) -> Relations:
+        """
+        Get relations between patients call
+        :return: Binary relation between patients
+        """
+        path = '/v2/pedigree/relations'
+        response: dict = self.get(path)
+        return Relations(**response)
 
     def get_headers(self):
         token = self.keycloak.get_token()
@@ -48,17 +103,18 @@ class TransmartRestClient(object):
             raise TransmartException()
         return response.json()
 
-    def get(self, path: str):
+    def get(self, path: str, **kwargs):
         """
         GET call to the tranSMART server.
         :param path: the API path to call.
         :return: the response.
         """
-        url = f'{self.url}{path}'
-        logging.info('Making a GET call to: %s' % url)
+        url = f'{self.config.url}{path}'
+        logging.debug('Making a GET call to: %s' % url)
         r = requests.get(url=url,
+                         params=kwargs,
                          headers=self.get_headers(),
-                         verify=self.verify)
+                         verify=self.config.verify)
         return self.get_response_json(r)
 
     def post(self, path: str, body=None):
@@ -68,10 +124,10 @@ class TransmartRestClient(object):
         :param path: the API path to call
         :return: the response.
         """
-        url = f'{self.url}{path}'
-        logging.info('Making a POST call to: %s' % url)
+        url = f'{self.config.url}{path}'
+        logging.debug('Making a POST call to: %s' % url)
         r = requests.post(url=url,
                           json=body,
                           headers=self.get_headers(),
-                          verify=self.verify)
+                          verify=self.config.verify)
         return self.get_response_json(r)
