@@ -90,8 +90,40 @@ Run tests (including coverage) with:
 Usage
 -----
 
-In progress...
+Read subset of data from the configured tranSMART instance, based on the constraint specified in an input JSON file
+and write the output in transmart-copy_ format to /path/to/output.
+The output directory should be empty of not existing (then it will be created).
 
+Input constraint has to be a `valid tranSMART constraint`_. Example of <input.json> file content:
+
+.. code-block:: JSON
+
+  {
+    "type": "study_name",
+    "studyId": "EHR"
+  }
+
+
+Run:
+
+.. code-block:: bash
+
+  transmart-hyper-dicer <input.json> /path/to/output
+
+
+This generates the directories ``i2b2metadata`` and ``i2b2demodata`` in the ``output`` directory.
+The generated data can be loaded using transmart-copy_:
+
+.. code-block:: console
+
+  # Download transmart-copy:
+  curl -f -L https://repo.thehyve.nl/service/local/repositories/releases/content/org/transmartproject/transmart-copy/17.1-HYVE-6.2/transmart-copy-17.1-HYVE-6.2.jar -o transmart-copy.jar
+  # Load data
+  PGUSER=tm_cz PGPASSWORD=tm_cz java -jar transmart-copy.jar -d output
+
+
+.. _transmart-copy: https://github.com/thehyve/transmart-core/tree/dev/transmart-copy
+.. _`valid tranSMART constraint`: https://transmart.thehyve.net/open-api/index.html
 
 Package management and dependencies
 -----------------------------------
