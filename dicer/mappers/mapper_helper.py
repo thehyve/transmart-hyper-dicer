@@ -98,9 +98,10 @@ def map_study(study: Study) -> TLStudy:
     )
 
 
-def get_study_id_to_study_dict(study_dim_elements: List[Value], all_studies: List[Study]):
+def get_study_id_to_study_dict(study_dim_element_values: List[Value], all_studies: List[Study]):
     study_id_to_study: Dict[str, TLStudy] = {}
+    study_dim_elements = set(map(lambda x: StudyDimensionElement(**x).name, study_dim_element_values))
     for study in all_studies:
-        if study.studyId in list(map(lambda x: StudyDimensionElement(**x).name, study_dim_elements)):
+        if study.studyId in study_dim_elements:
             study_id_to_study[study.studyId] = map_study(study)
     return study_id_to_study
