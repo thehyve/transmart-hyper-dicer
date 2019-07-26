@@ -18,9 +18,9 @@ deploy:
   provider: pypi
   distributions: "sdist bdist_wheel"
   skip_existing: true
-  user: ewelinagr
+  user: ewelina
   password:
-    secure: <TODO>
+    secure: ZLGtZpFPR/ItByFwqMfYpWhfg/A5PNjRSrJl09RlOXO4UK4UMiRwK93R91w0uc/gPweCJ9lACyRrkCvUKzAOvpDMx7UYVMO6NHYdapFRuOr8L9blcULdAGm0ahqEFWNi9SJeZvjGxtfkn7NLgyZRsdgh6nl4HN2m5/YrfIXH790Z9RIgjFSxGfktLDyFjEJOKvvyKDtNdvF/DddnD85M5p2M/TZ/zFRFVsLblXwlhThUHIcDrFWVDRzc7ngHNc0/K5Fr9cxulxLl4dDay3JSki51FGGWTMtrvKJWoMOMPS0JGqkpAWnXuJwgBozWRLTneh6uUpO6v05kp2bV786yuetrpx6xo1y7gjZhKiVMsUZAxmz2QiMWB4i8zIbpjgbIJ9Vnvi3qNnRlW/SAX+uRiViq1rWYUpCLsgXCPdJqk7mll3g3WIgmr7WD+vql8o82rvnBO1QZ5QSXDoto6WmzZZL80b0If2DZjEktK5lfJMt3FU+aM0BB04Xbj6NgtDo4a7fe8kErfOvFDxRdPRYUzx1tExNu03/qmK/Yzd6/DkSqveTPggoceGl6sXLaSeJ/HZ/1K/25yoAibBo0ZTdhu9gb+CA5TuiwgchPc0Y2v2SLxbOMu+SPqaad7GpzSh5HSg0a+UBotNBd1Lpk2QZpEfnPO8NVW6VkPlyquZYp/vw=
   on:
     tags: true
     branch: master
