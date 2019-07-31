@@ -91,6 +91,7 @@ class TestTransmartLoaderMapper:
         assert len(studies) == 1
         assert studies[0].name == 'CATEGORICAL_VALUES'
         assert studies[0].study_id == 'CATEGORICAL_VALUES'
+        assert len(studies[0].metadata['conceptCodeToVariableMetadata']) == 2
 
     def test_trial_visits_mapping(self):
         trial_visits = self.qr_collection.trial_visits
@@ -119,6 +120,7 @@ class TestTransmartLoaderMapper:
         assert isinstance(ontology[0], StudyNode)
         assert ontology[0].name == 'CATEGORICAL_VALUES'
         assert ontology[0].study.study_id == 'CATEGORICAL_VALUES'
+        assert ontology[0].metadata.value == {'upload date': '2019-07-31'}
         assert len(ontology[0].children) == 1
         assert ontology[0].children[0].name == 'Demography'
         assert len(ontology[0].children[0].children) == 3
