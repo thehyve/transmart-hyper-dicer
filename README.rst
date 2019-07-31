@@ -43,8 +43,8 @@ Connection to Keycloak identity provider and tranSMART is configured by setting 
 | OFFLINE_TOKEN       | An offline token used used as a refresh token in order to communicate with TranSMART |
 +---------------------+--------------------------------------------------------------------------------------+
 
-In order to generate an offline token for `USERNAME` user, the following `curl` command can be used.
-To get the token the user needs to have the role mapping for the realm-level: `"offline_access"`.
+In order to generate an offline token for ``USERNAME`` user, the following ``curl`` command can be used.
+To get the token the user needs to have the role mapping for the realm-level: ``offline_access``.
 Before using the command you have to substitute words in uppercase with proper ones.
 
 .. code-block:: bash
@@ -59,6 +59,17 @@ Before using the command you have to substitute words in uppercase with proper o
 
 
 The value of the `refresh_token` field in the response is the offline token.
+
+All the variables can be specified in the ``.env`` file as key-value pairs. They will be automatically set as environment variables, when starting the application. Sample of the ``.env`` file:
+
+.. code-block:: bash
+
+   KEYCLOAK_CLIENT_ID=transmart-client
+   KEYCLOAK_SERVER_URL=https://keycloak.example.com
+   KEYCLOAK_REALM=dev
+   OFFLINE_TOKEN=<refresh_token value from the curl response>
+   TRANSMART_URL=https://transmart.example.com
+
 
 Installation
 ------------
