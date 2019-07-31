@@ -60,7 +60,7 @@ Before using the command you have to substitute words in uppercase with proper o
 
 The value of the `refresh_token` field in the response is the offline token.
 
-All the variables can be specified in the ``.env`` file as key-value pairs. They will be automatically set as environment variables, when starting the application. Sample of the ``.env`` file:
+All the variables can be specified in the ``.env`` file as key-value pairs. They will be automatically set as environment variables, when starting the application. Example of the ``.env`` file:
 
 .. code-block:: bash
 
