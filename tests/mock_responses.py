@@ -360,7 +360,7 @@ POST_JSON_RESPONSES = {
 }
 
 GET_JSON_RESPONSES = {
-    '/v2/tree_nodes?depth=0&tags=True&counts=False': {
+    '/v2/tree_nodes?depth=0&tags=True&counts=False&constraints=False': {
         'tree_nodes': [
             {
                 'name': 'CATEGORICAL_VALUES',
@@ -375,6 +375,9 @@ GET_JSON_RESPONSES = {
                 'constraint': {
                     'type': 'study_name',
                     'studyId': 'CATEGORICAL_VALUES'
+                },
+                'metadata': {
+                    'upload date': '2019-07-31'
                 },
                 'children': [
                     {
@@ -625,7 +628,44 @@ GET_JSON_RESPONSES = {
                     'study',
                     'concept',
                     'patient'
-                ]
+                ],
+                'metadata': {
+                    'conceptCodeToVariableMetadata': {
+                        'gender': {
+                            'columns': 14,
+                            'decimals': None,
+                            'description': 'Gender',
+                            'measure': 'NOMINAL',
+                            'missingValues': {
+                                'lower': None,
+                                'upper': None,
+                                'values': [
+                                    -2
+                                ]
+                            },
+                            'name': 'gender1',
+                            'type': 'NUMERIC',
+                            'valueLabels': {
+                                '1': 'Female',
+                                '2': 'Male',
+                                '-2': 'Not Specified'
+                            },
+                            'width': 12
+                        },
+                        'birthdate': {
+                            'columns': 22,
+                            'decimals': None,
+                            'description': 'Birth Date',
+                            'measure': 'SCALE',
+                            'missingValues': None,
+                            'name': 'birthdate1',
+                            'type': 'DATE',
+                            'valueLabels': {},
+                            'width': 22
+                        }
+                    }
+                }
+
             }
         ]
     },

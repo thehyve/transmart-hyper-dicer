@@ -34,16 +34,17 @@ class TransmartRestClient(object):
         response: dict = self.post(path, body)
         return Hypercube(**response)
 
-    def get_tree_nodes(self, depth=0, tags=True, counts=False) -> TreeNodes:
+    def get_tree_nodes(self, depth=0, tags=True, counts=False, constraints=False) -> TreeNodes:
         """
         Get tree nodes call
         :param depth: maximum tree node depth
         :param tags: include metadata tags
         :param counts: include counts
+        :param constraints: include constraints
         :return: The response of the tree nodes call of the transmart API
         """
         path = '/v2/tree_nodes'
-        response: dict = self.get(path, depth=depth, tags=tags, counts=counts)
+        response: dict = self.get(path, depth=depth, tags=tags, counts=counts, constraints=constraints)
         return TreeNodes(**response)
 
     def get_dimensions(self) -> Dimensions:

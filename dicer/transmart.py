@@ -144,7 +144,6 @@ class StudyDimensionElement(BaseModel):
     Study properties
     """
     name: str
-    # metadata: Optional[dict[str, str]]
 
 
 class VisitDimensionElement(BaseModel):

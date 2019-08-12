@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict
 
 from transmart_loader.transmart import Concept as TLConcept, TreeNode as TLTreeNode, StudyNode as TLStudyNode, \
-    Study as TLStudy, ConceptNode as TLConceptNode
+    Study as TLStudy, ConceptNode as TLConceptNode, TreeNodeMetadata
 
 from dicer.mappers.mapper_helper import observed_value_type_to_value_type
 from dicer.transmart import ConceptDimensionElement, Value, TreeNode, ObservedValueType
@@ -58,6 +58,8 @@ class OntologyMapper:
         else:
             node = TLTreeNode(tree_node_obj.name)
         if node is not None:
+            if tree_node_obj.metadata is not None:
+                node.metadata = TreeNodeMetadata(tree_node_obj.metadata)
             self.map_tree_node_children(node, tree_node_obj)
         return node
 
