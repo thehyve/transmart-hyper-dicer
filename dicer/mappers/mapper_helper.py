@@ -94,7 +94,8 @@ def map_trial_visit(trial_visit: TrialVisitDimensionElement, study_id_to_study: 
 def map_study(study: Study) -> TLStudy:
     return TLStudy(
         study.studyId,
-        study.studyId
+        study.studyId,
+        study.metadata
     )
 
 

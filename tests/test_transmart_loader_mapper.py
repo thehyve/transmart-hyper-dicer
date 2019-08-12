@@ -120,7 +120,7 @@ class TestTransmartLoaderMapper:
         assert isinstance(ontology[0], StudyNode)
         assert ontology[0].name == 'CATEGORICAL_VALUES'
         assert ontology[0].study.study_id == 'CATEGORICAL_VALUES'
-        assert ontology[0].metadata.value == {'upload date': '2019-07-31'}
+        assert ontology[0].metadata.values == {'upload date': '2019-07-31'}
         assert len(ontology[0].children) == 1
         assert ontology[0].children[0].name == 'Demography'
         assert len(ontology[0].children[0].children) == 3
