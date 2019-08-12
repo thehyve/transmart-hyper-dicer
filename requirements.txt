@@ -4,4 +4,4 @@ pydantic == 0.30
 python-dotenv == 0.10.3
 PyYAML == 5.1
 requests == 2.22.0
-transmart-loader == 1.1.0
+transmart-loader == 1.2.0
