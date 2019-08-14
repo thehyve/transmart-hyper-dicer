@@ -9,10 +9,6 @@ from dicer.transmart import RelationType, Dimension as DimensionObject, Study, T
     ValueType, ObservedValueType, DimensionType, StudyDimensionElement, Value
 
 
-class DataInconsistencyException(Exception):
-    pass
-
-
 def dimension_type_object_to_dimension_type(dim_type_obj: DimensionType) -> TLDimensionType:
     if dim_type_obj is DimensionType.Subject:
         return TLDimensionType.Subject
@@ -79,30 +75,3 @@ def map_dimension(dimension: DimensionObject, modifiers: List[TLModifier]) -> TL
         dimension_type_object_to_dimension_type(dimension.dimensionType),
         dimension.sortIndex
     )
-
-
-def map_trial_visit(trial_visit: TrialVisitDimensionElement, study_id_to_study: Dict[str, TLStudy]) -> TLTrialVisit:
-    study = study_id_to_study.get(trial_visit.studyId)
-    return TLTrialVisit(
-        study,
-        trial_visit.relTimeLabel,
-        trial_visit.relTimeUnit,
-        trial_visit.relTime
-    )
-
-
-def map_study(study: Study) -> TLStudy:
-    return TLStudy(
-        study.studyId,
-        study.studyId,
-        study.metadata
-    )
-
-
-def get_study_id_to_study_dict(study_dim_element_values: List[Value], all_studies: List[Study]):
-    study_id_to_study: Dict[str, TLStudy] = {}
-    study_dim_elements = set(map(lambda x: StudyDimensionElement(**x).name, study_dim_element_values))
-    for study in all_studies:
-        if study.studyId in study_dim_elements:
-            study_id_to_study[study.studyId] = map_study(study)
-    return study_id_to_study

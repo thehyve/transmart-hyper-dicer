@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict
 
+from dicer.data_exception import DataException
 from transmart_loader.transmart import Concept as TLConcept, Patient as TLPatient, Visit as TLVisit, \
     TrialVisit as TLTrialVisit, Modifier as TLModifier, Observation as TLObservation, \
     ObservationMetadata as TLObservationMetadata, CategoricalValue as TLCategoricalValue, \
@@ -7,7 +8,7 @@ from transmart_loader.transmart import Concept as TLConcept, Patient as TLPatien
 
 from dicer.mappers.mapper_helper import value_by_value_type
 from dicer.transmart import ConceptDimensionElement, Hypercube, DimensionDeclaration, PatientDimensionElement, \
-    VisitDimensionElement, TrialVisitDimensionElement, Cell
+    VisitDimensionElement, TrialVisitDimensionElement, Cell, StudyDimensionElement
 
 
 class ObservationMapper:
@@ -28,8 +29,11 @@ class ObservationMapper:
         self.modifiers = modifiers
 
     @staticmethod
-    def get_index_by_dimension_name(dimensions: List[DimensionDeclaration], name: str):
-        return next(i for i, dim in enumerate(dimensions) if dim.name == name)
+    def get_index_by_dimension_name(dimensions: List[DimensionDeclaration], name: str, mandatory: bool = False):
+        index = next((i for i, dim in enumerate(dimensions) if dim.name == name), None)
+        if index is None and mandatory:
+            raise DataException(f'Missing mandatory dimension {name}')
+        return index
 
     @staticmethod
     def get_observation_value(cell: Cell) -> TLValue:
@@ -61,6 +65,12 @@ class ObservationMapper:
                                       self.trial_visits))
         return trial_visit
 
+    def get_observation_trial_visit_for_study(self, study_dim_element: StudyDimensionElement) -> Optional[TLTrialVisit]:
+        trial_visit = next(filter(lambda x: (x.study.study_id == study_dim_element.name), self.trial_visits), None)
+        if trial_visit is None:
+            raise DataException(f'No trial visit found for study {study_dim_element.name}')
+        return trial_visit
+
     def get_observation_visit(self, visit_dim_element: VisitDimensionElement) -> Optional[TLVisit]:
         if visit_dim_element:
             return next(filter(lambda x: x.identifier == visit_dim_element.encounterIds['VISIT_ID'], self.visits))
@@ -80,10 +90,11 @@ class ObservationMapper:
 
         start_time_dimension_idx = self.get_index_by_dimension_name(inline_dimensions, 'start time')
         end_time_dimension_idx = self.get_index_by_dimension_name(inline_dimensions, 'end time')
-        patient_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'patient')
-        concept_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'concept')
+        patient_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'patient', True)
+        concept_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'concept', True)
         visit_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'visit')
-        trial_visits_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'trial visit')
+        trial_visit_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'trial visit')
+        study_dimension_idx = self.get_index_by_dimension_name(indexed_dimensions, 'study', True)
 
         for cell in hypercube.cells:
             patient_dim_elem_idx = cell.dimensionIndexes[patient_dimension_idx]
@@ -94,21 +105,29 @@ class ObservationMapper:
             concept_dim_elem = ConceptDimensionElement(**hypercube.dimensionElements['concept'][concept_dim_elem_idx])
             observation_concept = self.get_observation_concept(concept_dim_elem)
 
-            observation_visit = None # optional
+            observation_visit = None  # Optional
             visit_dim_elem_idx = cell.dimensionIndexes[visit_dimension_idx]
             if visit_dim_elem_idx is not None:
                 visit_dim_element = VisitDimensionElement(**hypercube.dimensionElements['visit'][visit_dim_elem_idx])
                 observation_visit = self.get_observation_visit(visit_dim_element)
 
-            trial_visit_dim_elem_idx = cell.dimensionIndexes[trial_visits_dimension_idx]
-            trial_visit_dim_elem = TrialVisitDimensionElement(
-                **hypercube.dimensionElements['trial visit'][trial_visit_dim_elem_idx])
-            observation_trial_visit = self.get_observation_trial_visit(trial_visit_dim_elem)
+            if trial_visit_dimension_idx is None:
+                # get trial visit from study
+                study_dim_elem_idx = cell.dimensionIndexes[study_dimension_idx]
+                study_dim_elem = StudyDimensionElement(
+                    **hypercube.dimensionElements['study'][study_dim_elem_idx])
+                observation_trial_visit = self.get_observation_trial_visit_for_study(study_dim_elem)
+            else:
+                trial_visit_dim_elem_idx = cell.dimensionIndexes[trial_visit_dimension_idx]
+                trial_visit_dim_elem = TrialVisitDimensionElement(
+                    **hypercube.dimensionElements['trial visit'][trial_visit_dim_elem_idx])
+                observation_trial_visit = self.get_observation_trial_visit(trial_visit_dim_elem)
 
             observation_start_time = cell.inlineDimensions[start_time_dimension_idx]
             observation_end_time = cell.inlineDimensions[end_time_dimension_idx]
             observation_value = self.get_observation_value(cell)
-            observation_metadata = self.get_observation_metadata(cell, hypercube, indexed_dimensions, modifier_dimensions)
+            observation_metadata =\
+                self.get_observation_metadata(cell, hypercube, indexed_dimensions, modifier_dimensions)
 
             observations.append(TLObservation(
                 observation_patient,
