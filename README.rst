@@ -42,6 +42,10 @@ Connection to Keycloak identity provider and tranSMART is configured by setting 
 +---------------------+--------------------------------------------------------------------------------------+
 | OFFLINE_TOKEN       | An offline token used used as a refresh token in order to communicate with TranSMART |
 +---------------------+--------------------------------------------------------------------------------------+
+| VERIFY_CERT         | Either a boolean, in which case it controls whether the server’s                     |
+|                     | TLS certificate is verified, or a string, in which case it must be a path            |
+|                     | to a CA bundle to use. Defaults to True.                                             |
++---------------------+--------------------------------------------------------------------------------------+
 
 In order to generate an offline token for ``USERNAME`` user, the following ``curl`` command can be used.
 To get the token the user needs to have the role mapping for the realm-level: ``offline_access``.
