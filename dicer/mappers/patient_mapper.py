@@ -3,7 +3,7 @@ from typing import Dict, List
 from transmart_loader.transmart import Patient as TLPatient, IdentifierMapping as TLIdentifierMapping, \
     Relation as TLRelation, RelationType as TLRelationType, Visit as TLVisit
 
-from dicer.mappers.mapper_helper import DataInconsistencyException
+from dicer.data_exception import DataException
 from dicer.transmart import PatientDimensionElement, Relation, Value, VisitDimensionElement
 
 
@@ -21,8 +21,8 @@ class PatientMapper:
 
     def map_patient(self, patient_dimension_element: PatientDimensionElement) -> TLPatient:
         if not patient_dimension_element.subjectIds or 'SUBJ_ID' not in patient_dimension_element.subjectIds:
-            raise DataInconsistencyException('Missing SUBJ_ID mapping for patient with id {}'
-                                             .format(patient_dimension_element.id))
+            raise DataException('Missing SUBJ_ID mapping for patient with id {}'
+                                .format(patient_dimension_element.id))
 
         patient = TLPatient(
             patient_dimension_element.subjectIds['SUBJ_ID'],
@@ -37,7 +37,7 @@ class PatientMapper:
                              left: TLPatient, right: TLPatient) -> TLRelation:
         relation_type = next((x for x in relation_types if x.label == relation.relationTypeLabel), None)
         if not relation_type:
-            raise DataInconsistencyException('Relation {} does not exist.'.format(relation.relationTypeLabel))
+            raise DataException('Relation {} does not exist.'.format(relation.relationTypeLabel))
 
         return TLRelation(
             left,
@@ -49,12 +49,12 @@ class PatientMapper:
 
     def map_patient_visit(self, visit: VisitDimensionElement) -> TLVisit:
         if not visit.encounterIds or 'VISIT_ID' not in visit.encounterIds:
-            raise DataInconsistencyException('Missing visit encounter ID')
+            raise DataException('Missing visit encounter ID')
         visit_encounter_id = visit.encounterIds['VISIT_ID']
 
         patient = self.patient_id_to_patient.get(visit.patientId)
         if not patient:
-            raise DataInconsistencyException('Missing patient for visit {}'.format(visit_encounter_id))
+            raise DataException('Missing patient for visit {}'.format(visit_encounter_id))
 
         return TLVisit(
             patient,

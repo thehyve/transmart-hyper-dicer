@@ -36,7 +36,7 @@ class HyperDicer:
             transmart_client.get_relations()
         )
 
-        collection: DataCollection = TransmartLoaderMapper.map_query_results(query_results)
+        collection: DataCollection = TransmartLoaderMapper().map_query_results(query_results)
 
         Console.info('Writing files to {}'.format(output_dir))
         copy_writer = TransmartCopyWriter(str(output_dir))
