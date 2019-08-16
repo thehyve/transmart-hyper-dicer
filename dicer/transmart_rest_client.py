@@ -13,7 +13,7 @@ class TransmartException(Exception):
 
 class TransmartConfiguration(BaseModel):
     url: str
-    verify: bool = True
+    verify_cert: bool = True
     keycloak_config: KeycloakConfiguration
 
 
@@ -115,7 +115,7 @@ class TransmartRestClient(object):
         r = requests.get(url=url,
                          params=kwargs,
                          headers=self.get_headers(),
-                         verify=self.config.verify)
+                         verify=self.config.verify_cert)
         return self.get_response_json(r)
 
     def post(self, path: str, body=None):
@@ -130,5 +130,5 @@ class TransmartRestClient(object):
         r = requests.post(url=url,
                           json=body,
                           headers=self.get_headers(),
-                          verify=self.config.verify)
+                          verify=self.config.verify_cert)
         return self.get_response_json(r)
