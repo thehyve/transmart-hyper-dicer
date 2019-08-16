@@ -75,7 +75,7 @@ def dicer(input_file: Path, output_dir: Path, debug: bool):
        :param output_dir: Empty output directory where staging files are written
     """
     try:
-        load_dotenv()
+        load_dotenv(os.path.join(os.getcwd(), '.env'))
         setup_logging(logging.DEBUG if debug else logging.INFO)
         Console.title('TranSMART Hyper Dicer')
         hyper_dicer = HyperDicer(read_config())
