@@ -1,7 +1,7 @@
 import logging
 
 import requests
-from pydantic import BaseModel
+from pydantic import BaseModel, Union
 
 from dicer.transmart import Hypercube, Dimensions, TreeNodes, Studies, RelationTypes, Relations
 from .keycloak_rest_client import KeycloakRestClient, KeycloakConfiguration
@@ -13,7 +13,7 @@ class TransmartException(Exception):
 
 class TransmartConfiguration(BaseModel):
     url: str
-    verify_cert: bool = True
+    verify_cert: Union[bool, str] = True
     keycloak_config: KeycloakConfiguration
 
 
@@ -21,7 +21,7 @@ class TransmartRestClient(object):
 
     def __init__(self, config: TransmartConfiguration):
         self.config = config
-        self.keycloak = KeycloakRestClient(config.keycloak_config)
+        self.keycloak = KeycloakRestClient(config.keycloak_config, config.verify_cert)
 
     def get_observations(self, constraint: dict) -> Hypercube:
         """

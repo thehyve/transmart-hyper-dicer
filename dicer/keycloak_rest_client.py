@@ -1,3 +1,5 @@
+from typing import Union
+
 import requests
 from pydantic import BaseModel
 
@@ -14,9 +16,10 @@ class KeycloakConfiguration(BaseModel):
 
 class KeycloakRestClient(object):
 
-    def __init__(self, config: KeycloakConfiguration):
+    def __init__(self, config: KeycloakConfiguration, verify_cert: Union[bool, str]):
         self.token = None
         self.config = config
+        self.verify_cert = verify_cert
 
     def get_token(self):
         """
@@ -44,7 +47,7 @@ class KeycloakRestClient(object):
             'refresh_token': self.config.offline_token
         }
         try:
-            response = requests.post(url, params, headers=headers)
+            response = requests.post(url, params, headers=headers, verify=self.verify_cert)
             if not response.ok:
                 response.raise_for_status()
             data = response.json()
