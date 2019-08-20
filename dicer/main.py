@@ -51,7 +51,11 @@ def read_config() -> TransmartConfiguration:
     config = TransmartConfiguration(
         url=read_env_variable('TRANSMART_URL'),
         keycloak_config=keycloak_config,
-        verify_cert=os.environ.get('VERIFY_CERT', True)
+        verify_cert=(lambda value:
+                     True if value is None or value == '' or value.lower() == 'true'
+                     else False if value.lower() == 'false'
+                     else value,
+                     os.environ.get('VERIFY_CERT'))
     )
     return config
 
