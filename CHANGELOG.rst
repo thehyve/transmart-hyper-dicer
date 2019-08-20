@@ -8,6 +8,16 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 [Unreleased]
 ************
 
+
+[0.1.1]
+************
+
+Changed
+-------
+
+* Fix for handling 'VERIFY_CERT' env variable.
+
+
 [0.1.0]
 ************
 
