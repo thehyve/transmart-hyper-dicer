@@ -9,6 +9,17 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 ************
 
 
+[0.1.2]
+************
+
+Changed
+-------
+
+* Fix mapping for observations without end time.
+* Skip subtrees without study or concept nodes in ontology mapping.
+* Fix for handling 'VERIFY_CERT' env variable.
+
+
 [0.1.1]
 ************
 
