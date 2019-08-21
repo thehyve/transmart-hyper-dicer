@@ -124,7 +124,8 @@ class ObservationMapper:
                 observation_trial_visit = self.get_observation_trial_visit(trial_visit_dim_elem)
 
             observation_start_time = cell.inlineDimensions[start_time_dimension_idx]
-            observation_end_time = cell.inlineDimensions[end_time_dimension_idx]
+            observation_end_time = cell.inlineDimensions[end_time_dimension_idx] \
+                if end_time_dimension_idx is not None else None
             observation_value = self.get_observation_value(cell)
             observation_metadata =\
                 self.get_observation_metadata(cell, hypercube, indexed_dimensions, modifier_dimensions)
