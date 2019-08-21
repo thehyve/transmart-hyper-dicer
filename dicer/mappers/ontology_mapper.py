@@ -51,16 +51,20 @@ class OntologyMapper:
         return None
 
     def map_tree_node(self, tree_node_obj: TreeNode) -> TLTreeNode:
+        terminal_node = True
         if tree_node_obj.type is ObservedValueType.Study:
             node = self.map_study_node(tree_node_obj)
         elif tree_node_obj.conceptCode:
             node = self.map_concept_node(tree_node_obj)
         else:
+            terminal_node = False
             node = TLTreeNode(tree_node_obj.name)
         if node is not None:
             if tree_node_obj.metadata is not None:
                 node.metadata = TreeNodeMetadata(tree_node_obj.metadata)
             self.map_tree_node_children(node, tree_node_obj)
+            if not terminal_node and len(node.children) == 0:
+                return None
         return node
 
     def map_tree_nodes(self, tree_node_objects: List[TreeNode]) -> List[TLTreeNode]:

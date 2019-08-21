@@ -1,7 +1,9 @@
+import json
 import logging
+from typing import Any
 
 import requests
-from pydantic import BaseModel, Union
+from pydantic import BaseModel
 
 from dicer.transmart import Hypercube, Dimensions, TreeNodes, Studies, RelationTypes, Relations
 from .keycloak_rest_client import KeycloakRestClient, KeycloakConfiguration
@@ -13,7 +15,7 @@ class TransmartException(Exception):
 
 class TransmartConfiguration(BaseModel):
     url: str
-    verify_cert: Union[bool, str] = True
+    verify_cert: Any = True
     keycloak_config: KeycloakConfiguration
 
 
@@ -101,6 +103,9 @@ class TransmartRestClient(object):
             raise TransmartException()
         if response.status_code not in [200, 201]:
             logging.error(f'Request failed. Error occurred. Response status {response.status_code}')
+            response_type = response.headers.get('content-type', '').split(';')[0]
+            if response_type == 'application/json':
+                logging.error(json.dumps(response.json(), indent=2))
             raise TransmartException()
         return response.json()
 

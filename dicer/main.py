@@ -4,6 +4,7 @@ import os
 import sys
 import traceback
 from pathlib import Path
+from typing import Union
 
 import click
 from dotenv import load_dotenv
@@ -37,6 +38,12 @@ def read_env_variable(variable_name: str) -> str:
     return res
 
 
+def read_verify_cert(value: str) -> Union[bool, str]:
+    return True if value is None or value == '' or value.lower() == 'true' \
+        else False if value.lower() == 'false' \
+        else value
+
+
 def read_config() -> TransmartConfiguration:
     """
     Reads connnection configuration from environment variables.
@@ -51,11 +58,7 @@ def read_config() -> TransmartConfiguration:
     config = TransmartConfiguration(
         url=read_env_variable('TRANSMART_URL'),
         keycloak_config=keycloak_config,
-        verify_cert=(lambda value:
-                     True if value is None or value == '' or value.lower() == 'true'
-                     else False if value.lower() == 'false'
-                     else value,
-                     os.environ.get('VERIFY_CERT'))
+        verify_cert=read_verify_cert(os.environ.get('VERIFY_CERT'))
     )
     return config
 
