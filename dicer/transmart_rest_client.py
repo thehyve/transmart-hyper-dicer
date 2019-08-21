@@ -1,7 +1,8 @@
 import logging
+from typing import Any
 
 import requests
-from pydantic import BaseModel, Union
+from pydantic import BaseModel
 
 from dicer.transmart import Hypercube, Dimensions, TreeNodes, Studies, RelationTypes, Relations
 from .keycloak_rest_client import KeycloakRestClient, KeycloakConfiguration
@@ -13,7 +14,7 @@ class TransmartException(Exception):
 
 class TransmartConfiguration(BaseModel):
     url: str
-    verify_cert: Union[bool, str] = True
+    verify_cert: Any = True
     keycloak_config: KeycloakConfiguration
 
 
