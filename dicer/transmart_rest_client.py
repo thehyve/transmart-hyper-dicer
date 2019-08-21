@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Any
 
@@ -102,6 +103,9 @@ class TransmartRestClient(object):
             raise TransmartException()
         if response.status_code not in [200, 201]:
             logging.error(f'Request failed. Error occurred. Response status {response.status_code}')
+            response_type = response.headers.get('content-type', '').split(';')[0]
+            if response_type == 'application/json':
+                logging.error(json.dumps(response.json(), indent=2))
             raise TransmartException()
         return response.json()
 
