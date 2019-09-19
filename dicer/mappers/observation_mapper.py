@@ -106,7 +106,7 @@ class ObservationMapper:
             observation_concept = self.get_observation_concept(concept_dim_elem)
 
             observation_visit = None  # Optional
-            visit_dim_elem_idx = cell.dimensionIndexes[visit_dimension_idx]
+            visit_dim_elem_idx = cell.dimensionIndexes[visit_dimension_idx] if visit_dimension_idx else None
             if visit_dim_elem_idx is not None:
                 visit_dim_element = VisitDimensionElement(**hypercube.dimensionElements['visit'][visit_dim_elem_idx])
                 observation_visit = self.get_observation_visit(visit_dim_element)
