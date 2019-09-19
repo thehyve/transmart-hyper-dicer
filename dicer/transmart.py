@@ -4,6 +4,8 @@ from enum import Enum
 from pydantic import BaseModel, Schema
 from typing import Sequence, Optional, Dict, Union, Any
 
+from transmart_loader.transmart import StudyMetadata
+
 
 class ObservedValueType(str, Enum):
     Numeric = 'NUMERIC'
@@ -214,7 +216,7 @@ class Study(BaseModel):
     Study properties
     """
     studyId: str
-    metadata: Optional[Dict[str, Any]]
+    metadata: Optional[StudyMetadata]
 
 
 class Studies(BaseModel):

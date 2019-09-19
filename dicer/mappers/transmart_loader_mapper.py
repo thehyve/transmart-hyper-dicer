@@ -55,8 +55,10 @@ class TransmartLoaderMapper:
         patients = patient_mapper.map_patients(query_results.observations.dimensionElements.get('patient', []))
         relation_types = list(map(lambda x: map_relation_type(x), query_results.relation_types.relationTypes))
         relations = patient_mapper.map_patient_relations(query_results.relations.relations, relation_types)
-        visits = patient_mapper.map_patient_visits(query_results.observations.dimensionElements['visit'])
-
+        if 'visit' in query_results.observations.dimensionElements:
+            visits = patient_mapper.map_patient_visits(query_results.observations.dimensionElements['visit'])
+        else:
+            visits = []
         dimension_objects = query_results.dimensions.dimensions
         modifier_objects = list(filter(lambda x: x.modifierCode, dimension_objects))
         modifiers = list(map(lambda x: map_modifier(x), modifier_objects))
