@@ -91,7 +91,7 @@ class TestTransmartLoaderMapper:
         assert len(studies) == 1
         assert studies[0].name == 'CATEGORICAL_VALUES'
         assert studies[0].study_id == 'CATEGORICAL_VALUES'
-        assert len(studies[0].metadata['conceptCodeToVariableMetadata']) == 2
+        assert len(studies[0].metadata.conceptCodeToVariableMetadata) == 2
 
     def test_trial_visits_mapping(self):
         trial_visits = self.qr_collection.trial_visits
