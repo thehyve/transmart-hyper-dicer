@@ -3,6 +3,8 @@
 
 """Tests for the transmart query results to transmart-loader mappers.
 """
+from datetime import datetime
+
 import pytest
 from transmart_loader.copy_writer import format_date
 from transmart_loader.transmart import ValueType, DimensionType, StudyNode, ConceptNode, TreeNode
@@ -150,9 +152,9 @@ class TestTransmartLoaderMapper:
         assert list(map(lambda o: o.trial_visit.study.study_id, observations)) == [
             'CATEGORICAL_VALUES', 'CATEGORICAL_VALUES', 'CATEGORICAL_VALUES']
         assert list(map(lambda o: o.start_date, observations)) == [
-            '2019-05-05 11:11:11', '2019-07-22 12:00:00', None]
+            datetime(2019, 5, 5, 11, 11, 11), datetime(2019, 7, 22, 12, 0, 0), None]
         assert list(map(lambda o: o.end_date, observations)) == [
-            '2019-07-05 11:11:11', None, None]
+            datetime(2019, 7, 5, 11, 11, 11), None, None]
         assert list(map(lambda o: o.value.value, observations)) == [
             20, 'Caucasian', 'Female']
         assert list(map(lambda o: o.value.value_type, observations)) == [
