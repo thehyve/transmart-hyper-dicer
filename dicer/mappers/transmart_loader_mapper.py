@@ -1,11 +1,13 @@
-from transmart_loader.transmart import DataCollection, TrialVisit
+from typing import Dict
+
+from transmart_loader.transmart import DataCollection, TrialVisit as TLTrialVisit, Study as TLStudy
 
 from dicer.mappers.mapper_helper import *
 from dicer.mappers.observation_mapper import ObservationMapper
 from dicer.mappers.ontology_mapper import OntologyMapper
 from dicer.mappers.patient_mapper import PatientMapper
 from dicer.query_results import QueryResults
-from dicer.transmart import TrialVisitDimensionElement
+from dicer.transmart import TrialVisitDimensionElement, Study, StudyDimensionElement, Value
 
 
 class TransmartLoaderMapper:
@@ -40,7 +42,7 @@ class TransmartLoaderMapper:
             trial_visit.relTime
         )
 
-    def map_trial_visits(self, trial_visit_dim_elements: List[Value]) -> List[TrialVisit]:
+    def map_trial_visits(self, trial_visit_dim_elements: List[Value]) -> List[TLTrialVisit]:
         """Map trial visit dimension elements to trial visit objects if the trial visit
         dimension is available. Create dummy trial visits based on the list of studies otherwise."""
         if trial_visit_dim_elements is None:

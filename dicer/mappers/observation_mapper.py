@@ -1,10 +1,13 @@
 from typing import List, Optional, Dict
 
+from dateutil.parser import parse
+
 from dicer.data_exception import DataException
 from transmart_loader.transmart import Concept as TLConcept, Patient as TLPatient, Visit as TLVisit, \
     TrialVisit as TLTrialVisit, Modifier as TLModifier, Observation as TLObservation, \
     ObservationMetadata as TLObservationMetadata, CategoricalValue as TLCategoricalValue, \
-    NumericalValue as TLNumericalValue, Value as TLValue
+    NumericalValue as TLNumericalValue, Value as TLValue, ValueType, \
+    DateValue as TLDateValue, TextValue as TLTextValue
 
 from dicer.mappers.mapper_helper import value_by_value_type
 from dicer.transmart import ConceptDimensionElement, Hypercube, DimensionDeclaration, PatientDimensionElement, \
@@ -36,10 +39,18 @@ class ObservationMapper:
         return index
 
     @staticmethod
-    def get_observation_value(cell: Cell) -> TLValue:
-        value = TLCategoricalValue(cell.stringValue) if cell.stringValue else TLNumericalValue(
-            cell.numericValue)  # TODO DateValue?
-        return value
+    def get_observation_value(cell: Cell, value_type: ValueType) -> TLValue:
+        if value_type == ValueType.Categorical:
+            return TLCategoricalValue(cell.stringValue)
+        if value_type == ValueType.Numeric:
+            return TLNumericalValue(cell.numericValue)
+        if value_type == ValueType.Date:
+            return TLDateValue(parse(cell.stringValue))
+        if value_type == ValueType.Text:
+            return TLTextValue(cell.stringValue)
+        if value_type is None:
+            return TLCategoricalValue(cell.stringValue) if cell.stringValue else TLNumericalValue(cell.numericValue)
+        raise DataException(f'Unexpected value type {value_type} for observation')
 
     def get_observation_metadata(self, cell: Cell, hypercube: Hypercube,
                                  indexed_dimensions: List[DimensionDeclaration],
@@ -126,7 +137,7 @@ class ObservationMapper:
             observation_start_time = cell.inlineDimensions[start_time_dimension_idx]
             observation_end_time = cell.inlineDimensions[end_time_dimension_idx] \
                 if end_time_dimension_idx is not None else None
-            observation_value = self.get_observation_value(cell)
+            observation_value = self.get_observation_value(cell, observation_concept.value_type)
             observation_metadata =\
                 self.get_observation_metadata(cell, hypercube, indexed_dimensions, modifier_dimensions)
 
@@ -135,8 +146,8 @@ class ObservationMapper:
                 observation_concept,
                 observation_visit,
                 observation_trial_visit,
-                observation_start_time,
-                observation_end_time,
+                parse(observation_start_time) if observation_start_time else None,
+                parse(observation_end_time) if observation_end_time else None,
                 observation_value,
                 observation_metadata
             ))

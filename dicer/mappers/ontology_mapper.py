@@ -15,9 +15,9 @@ class OntologyMapper:
     def __init__(self, study_id_to_study: Dict[str, TLStudy], concept_dim_elements: List[Value]):
         self.study_id_to_study = study_id_to_study
         self.concept_code_to_concept: Dict[str, TLConcept] = {}
-        self.create_concept_to_concept_code_dict(concept_dim_elements)
+        self.create_concept_code_to_concept_dict(concept_dim_elements)
 
-    def create_concept_to_concept_code_dict(self, concepts_dim_elements: List[Value]):
+    def create_concept_code_to_concept_dict(self, concepts_dim_elements: List[Value]):
         for concepts_dim_element in concepts_dim_elements:
             self.map_concept(ConceptDimensionElement(**concepts_dim_element))
 

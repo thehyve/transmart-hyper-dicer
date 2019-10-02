@@ -1,12 +1,12 @@
-from typing import List, Dict
+from typing import List
 
 from transmart_loader.transmart import ValueType as TLValueType, RelationType as TLRelationType, \
-    Dimension as TLDimension, Modifier as TLModifier, Study as TLStudy, TrialVisit as TLTrialVisit, \
+    Dimension as TLDimension, Modifier as TLModifier, \
     CategoricalValue as TLCategoricalValue, NumericalValue as TLNumericalValue, Value as TLValue, \
     DateValue as TLDateValue, TextValue as TLTextValue, DimensionType as TLDimensionType
 
-from dicer.transmart import RelationType, Dimension as DimensionObject, Study, TrialVisitDimensionElement, \
-    ValueType, ObservedValueType, DimensionType, StudyDimensionElement, Value
+from dicer.transmart import RelationType, Dimension as DimensionObject, \
+    ValueType, ObservedValueType, DimensionType
 
 
 def dimension_type_object_to_dimension_type(dim_type_obj: DimensionType) -> TLDimensionType:
@@ -35,7 +35,7 @@ def observed_value_type_to_value_type(obs_value_type: ObservedValueType) -> TLVa
     elif obs_value_type is ObservedValueType.Date:
         return TLValueType.Date
     else:
-        return TLValueType.Text #TODO ?
+        return TLValueType.Text  # TODO ?
 
 
 def value_by_value_type(value, value_type: TLValueType) -> TLValue:
