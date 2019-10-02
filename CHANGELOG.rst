@@ -9,6 +9,17 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 ************
 
 
+[0.1.3]
+************
+
+Changed
+-------
+
+* Fix mapping of studies without visits.
+* Fix serialisation of dates and date values.
+* Fix serialisation of study nodes.
+
+
 [0.1.2]
 ************
 
