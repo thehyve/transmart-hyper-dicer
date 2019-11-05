@@ -140,6 +140,13 @@ The generated data can be loaded using transmart-copy_:
 .. _transmart-copy: https://github.com/thehyve/transmart-core/tree/dev/transmart-copy
 .. _`valid tranSMART constraint`: https://transmart.thehyve.net/open-api/index.html
 
+Limitations
+-----------
+
+transmart-hyper-dicer reads all selected data in memory at once, limiting
+the amount of data that can be processed to what fits in memory.
+Therefore it is not suited for very large data sets.
+
 Package management and dependencies
 -----------------------------------
 
