@@ -154,6 +154,10 @@ This project uses `pip` for installing dependencies and package management.
 
 * Dependencies should be added to `setup.py` in the `install_requires` list.
 
+Acknowledgement
+---------------
+This project was funded by the German Ministry of Education and Research (BMBF) as part of the project
+DIFUTURE - Data Integration for Future Medicine within the German Medical Informatics Initiative (grant no. 01ZZ1804D).
 
 License
 -------
