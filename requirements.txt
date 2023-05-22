@@ -3,5 +3,5 @@ pandas >= 0.25,<0.26
 pydantic >= 0.32,<0.33
 python-dotenv == 0.10.3
 PyYAML >= 5.1,<5.2
-requests == 2.22.0
+requests == 2.31.0
 transmart-loader == 1.3.3
